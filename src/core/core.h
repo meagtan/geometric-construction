@@ -21,6 +21,7 @@ struct Point {
     constr_num distance(const Point &other) const;
 
     // TODO overloaded operators for comparison, copy constructor etc.
+    bool operator==(const Point &other) const;
 };
 
 struct Line {
@@ -34,6 +35,8 @@ struct Line {
     constr_num distance(const Point &a) const;
 
     bool contains(const Point &a) const;
+
+    bool operator==(const Line &other) const;
 };
 
 struct Circle {
@@ -47,6 +50,8 @@ struct Circle {
     constr_num distance(const Point &a) const;
 
     bool contains(const Point &a) const;
+
+    bool operator==(const Circle &other) const;
 };
 
 struct _Move {};

@@ -12,7 +12,7 @@ Scope::~Scope()
         delete p;
 }
 
-// TODO generate new names
+// TODO do not add already existing points, lines and circles
 
 void Scope::add(Point *a)
 {

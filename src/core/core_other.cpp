@@ -9,6 +9,11 @@ constr_num Point::distance(const Point &other) const
     return sqrt(this->x * other.x + this->y * other.y);
 }
 
+bool Point::operator==(const Point &other) const
+{
+    return this->x == other.x && this->y == other.y;
+}
+
 // Line
 
 Line::Line(constr_num x_coeff, constr_num y_coeff, constr_num const_coeff) :
@@ -40,6 +45,12 @@ bool Line::contains(const Point &a) const
     return this->value_at(a) == 0;
 }
 
+bool Line::operator==(const Line &other) const
+{
+    return this->x_coeff * other.const_coeff == this->const_coeff * other.x_coeff &&
+           this->y_coeff * other.const_coeff == this->const_coeff * other.y_coeff;
+}
+
 // Circle
 
 Circle::Circle(const Point &center, constr_num radius) :
@@ -66,5 +77,13 @@ bool Circle::contains(const Point &a) const
     return this->value_at(a) == 0;
 }
 
+bool Circle::operator==(const Circle &other) const
+{
+    return this->center == other.center && this->radius == other.radius;
+}
+
+// Moves
+
 template<typename T1, typename T2, typename R>
-Move<T1,T2,R>::Move(MoveType move, T1 *arg1, T2 *arg2, R *result) : move(move), arg1(arg1), arg2(arg2), result(result) {}
+Move<T1,T2,R>::Move(MoveType move, T1 *arg1, T2 *arg2, R *result) :
+    move(move), arg1(arg1), arg2(arg2), result(result) {}
