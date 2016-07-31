@@ -68,9 +68,9 @@ private:
 
     // TODO store names for each point, line and circle
 
-    void add(Point *a, string prefix = "");
-    void add(Line *l, string prefix = "");
-    void add(Circle *c, string prefix = "");
+    void add(Point *a);
+    void add(Line *l);
+    void add(Circle *c);
 
 public:
     Scope();

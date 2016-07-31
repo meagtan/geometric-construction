@@ -14,17 +14,17 @@ Scope::~Scope()
 
 // TODO generate new names
 
-void Scope::add(Point *a, string prefix)
+void Scope::add(Point *a)
 {
     this->points.push_back(a);
 }
 
-void Scope::add(Line *l, string prefix)
+void Scope::add(Line *l)
 {
     this->lines.push_back(l);
 }
 
-void Scope::add(Circle *c, string prefix)
+void Scope::add(Circle *c)
 {
     this->circles.push_back(c);
 }
