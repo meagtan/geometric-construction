@@ -1,4 +1,4 @@
-#include <core.h>
+#include <src/core/core.h>
 
 Scope::Scope() : points(), lines(), circles()
 {

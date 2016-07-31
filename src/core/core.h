@@ -5,7 +5,7 @@
 #include <map>
 #include <utility>
 #include <string>
-#include <constr_num.h>
+#include <src/num/constr_num.h>
 
 using std::unordered_set;
 using std::map;
