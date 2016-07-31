@@ -1,4 +1,4 @@
-#include <src/core/core.h>
+#include "core.h"
 
 // Point
 
@@ -14,7 +14,7 @@ constr_num Point::distance(const Point &other) const
 Line::Line(constr_num x_coeff, constr_num y_coeff, constr_num const_coeff) :
     x_coeff(x_coeff), y_coeff(y_coeff), const_coeff(const_coeff) {}
 
-Line::Line(const Point &a, const Point &b, string n) :
+Line::Line(const Point &a, const Point &b) :
     x_coeff(a.y - b.y),
     y_coeff(b.x - a.x),
     const_coeff(a.x * b.y - a.y * b.x) {}
@@ -61,7 +61,7 @@ constr_num Circle::value_at(const Point &a) const
            this->radius * this->radius;
 }
 
-constr_num Circle::contains(const Point &a) const
+bool Circle::contains(const Point &a) const
 {
     return this->value_at(a) == 0;
 }

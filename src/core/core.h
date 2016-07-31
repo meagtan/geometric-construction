@@ -1,14 +1,12 @@
 #ifndef CORE_H
 #define CORE_H
 
-#include <unordered_set>
-#include <map>
-#include <utility>
+#include <vector>
 #include <string>
-#include <src/num/constr_num.h>
+#include <algorithm>
+#include "../num/constr_num.h"
 
-using std::unordered_set;
-using std::map;
+using std::vector;
 using std::pair;
 using std::string;
 
@@ -51,26 +49,36 @@ struct Circle {
     bool contains(const Point &a) const;
 };
 
+struct _Move {};
+
+template<typename T1, typename T2, typename R>
+struct Move : _Move {
+    enum move { compass = 'c', straightedge = 's', meet = 'm' };
+    T1 arg1;
+    T2 arg2;
+    R result;
+};
+
 class Scope {
 private:
-    map<string,Point*>  points;
-    map<string,Line*>   lines;
-    map<string,Circle*> circles;
-    // TODO also store relations such as meet and join between each shape, to be visualized
-    //   and included in derivations
+    vector<Point*>  points;
+    vector<Line*>   lines;
+    vector<Circle*> circles;
+    vector<_Move>   moves;
 
     // TODO store names for each point, line and circle
 
-    void add(Point *const a, string prefix = "");
-    void add(Line *const l, string prefix = "");
-    void add(Circle *const c, string prefix = "");
+    void add(Point *a, string prefix = "");
+    void add(Line *l, string prefix = "");
+    void add(Circle *c, string prefix = "");
 
 public:
     Scope();
+    ~Scope();
 
-    bool contains(Point *const a) const;
-    bool contains(Line *const l) const;
-    bool contains(Circle *const c) const;
+    bool contains(Point *a) const;
+    bool contains(Line *l) const;
+    bool contains(Circle *c) const;
 
     Line *join_line(Point &a, Point &b, bool check_contains = true);
     Circle *join_circle(Point &c, Point &o, bool check_contains = true);

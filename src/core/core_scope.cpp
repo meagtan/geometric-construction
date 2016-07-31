@@ -1,39 +1,48 @@
-#include <src/core/core.h>
+#include "core.h"
 
-Scope::Scope() : points(), lines(), circles()
+Scope::Scope() {}
+
+Scope::~Scope()
 {
-    // TODO
+    for (auto &p : points)
+        delete p;
+    for (auto &p : lines)
+        delete p;
+    for (auto &p : circles)
+        delete p;
 }
 
-void Scope::add(Point *const a, string prefix)
-{
+// TODO generate new names
 
+void Scope::add(Point *a, string prefix)
+{
+    this->points.push_back(a);
 }
 
-void Scope::add(Line *const l, string prefix)
+void Scope::add(Line *l, string prefix)
 {
-
+    this->lines.push_back(l);
 }
 
-void Scope::add(Circle *const c, string prefix)
+void Scope::add(Circle *c, string prefix)
 {
-
+    this->circles.push_back(c);
 }
 
-bool Scope::contains(Point *const a) const
+bool Scope::contains(Point *a) const
 {
     return (auto_construct_ints && a->x.is_int() && a->y.is_int()) ||
-           this->points.count(a);
+           std::count(this->points.begin(), this->points.end(), a);
 }
 
-bool Scope::contains(Line *const l) const
+bool Scope::contains(Line *l) const
 {
-    return this->lines.count(l);
+    return std::count(this->lines.begin(), this->lines.end(), l);
 }
 
-bool Scope::contains(Circle *const c) const
+bool Scope::contains(Circle *c) const
 {
-    return this->circles.count(c);
+    return std::count(this->circles.begin(), this->circles.end(), c);
 }
 
 // draw line connecting two points

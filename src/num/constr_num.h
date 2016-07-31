@@ -25,7 +25,7 @@ public:
     bool operator>=(const constr_num &a) const;
 };
 
-constr_num sqrt(constr_num);
-constr_num abs(constr_num);
+constr_num sqrt(const constr_num &a);
+constr_num abs(const constr_num &a);
 
 #endif // CONSTR_NUM_H
