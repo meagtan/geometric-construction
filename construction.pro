@@ -9,4 +9,10 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    core_scope.cpp \
+    core_other.cpp
+
+HEADERS += \
+    core.h \
+    constr_num.h
