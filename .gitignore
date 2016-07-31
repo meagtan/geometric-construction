@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
@@ -71,3 +72,34 @@ Thumbs.db
 *.dll
 *.exe
 
+=======
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+>>>>>>> c3e6973102b74261dfdf98dbda283a45f5c2712d
