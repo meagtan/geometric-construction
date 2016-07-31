@@ -65,3 +65,6 @@ bool Circle::contains(const Point &a) const
 {
     return this->value_at(a) == 0;
 }
+
+template<typename T1, typename T2, typename R>
+Move<T1,T2,R>::Move(MoveType move, T1 *arg1, T2 *arg2, R *result) : move(move), arg1(arg1), arg2(arg2), result(result) {}

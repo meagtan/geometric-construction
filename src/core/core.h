@@ -51,12 +51,16 @@ struct Circle {
 
 struct _Move {};
 
+enum struct MoveType { compass = 'c', straightedge = 's', meet = 'm' };
+
 template<typename T1, typename T2, typename R>
 struct Move : _Move {
-    enum move { compass = 'c', straightedge = 's', meet = 'm' };
-    T1 arg1;
-    T2 arg2;
-    R result;
+    MoveType move;
+    T1 *arg1;
+    T2 *arg2;
+    R *result;
+
+    Move(MoveType move, T1 *arg1, T2 *arg2, R *result);
 };
 
 class Scope {
