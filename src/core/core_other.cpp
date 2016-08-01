@@ -45,6 +45,12 @@ bool Line::contains(const Point &a) const
     return this->value_at(a) == 0;
 }
 
+bool Line::precedes(const Point &a, const Point &b) const
+{
+    return this->contains(a) && this->contains(b) &&
+           this->x_coeff * (b.x - a.x) > 0;
+}
+
 bool Line::operator==(const Line &other) const
 {
     return this->x_coeff * other.const_coeff == this->const_coeff * other.x_coeff &&

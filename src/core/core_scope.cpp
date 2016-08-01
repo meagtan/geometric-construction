@@ -1,6 +1,6 @@
 #include "include/core.h"
 
-Scope::Scope(MoveListener *listener) : listener(listener) {}
+Scope::Scope(MoveListener listener) : listener(listener) {}
 
 Scope::~Scope()
 {
@@ -147,9 +147,9 @@ pair<Point*,Point*> Scope::meet(Circle &a, Circle &b, bool check_contains)
 
     if (check_contains) {
         if (res.first != nullptr)
-            this->listener->receiveMove(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.first));
+            this->listener(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.first));
         if (res.second != nullptr)
-            this->listener->receiveMove(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.second));
+            this->listener(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.second));
     }
 
     return res;

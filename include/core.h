@@ -38,6 +38,9 @@ struct Line {
 
     bool contains(const Point &a) const;
 
+    // if point a precedes point b in line based on the direction of the vector (x_coeff, y_coeff)
+    bool precedes(const Point &a, const Point &b) const;
+
     bool operator==(const Line &other) const;
 };
 
@@ -79,7 +82,7 @@ private:
     vector<Point*>  points;
     vector<Line*>   lines;
     vector<Circle*> circles;
-    MoveListener *listener;
+    MoveListener listener;
 
     // TODO store names for each point, line and circle
 
@@ -88,7 +91,7 @@ private:
     void add(Circle *c);
 
 public:
-    Scope(MoveListener *listener);
+    Scope(MoveListener listener);
     ~Scope();
 
     bool contains(Point *a) const;

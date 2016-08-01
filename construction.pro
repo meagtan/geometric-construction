@@ -12,7 +12,8 @@ TEMPLATE = app
 SOURCES += \
     src/core/core_other.cpp \
     src/core/core_scope.cpp \
-    src/main.cpp
+    src/main.cpp \
+    src/core/geom.cpp
 
 HEADERS += \
     include/core.h \
