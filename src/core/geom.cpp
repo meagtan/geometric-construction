@@ -24,7 +24,7 @@ bool LineSegment::operator==(const LineSegment &other) const
 #define get_region(line, vertex, point) line.precedes(vertex, point) ? 1 : -1
 
 Angle::Angle(const Point &end1, const Point &vertex, const Point &end2) :
-    vertex(vertex), l1(*new Line(vertex, end1)), l2(*new Line(vertex, end2)),
+    l1(*new Line(vertex, end1)), l2(*new Line(vertex, end2)), vertex(vertex),
     region1(get_region(l1, vertex, end1)), region2(get_region(l2, vertex, end2)) {}
 
 Angle::Angle(const Line &l1, const Line &l2, int region1, int region2) :
