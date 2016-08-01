@@ -45,6 +45,12 @@ bool Scope::contains(Circle *c) const
     return std::count(this->circles.begin(), this->circles.end(), c);
 }
 
+#define _make_move(movetype, arg1, arg1type, arg2, arg2type, res, restype) do {               \
+    if (res != nullptr) {                                                                     \
+        this->add(res);                                                                       \
+        this->listener(Move<arg1type,arg2type,restype>(MoveType::movetype, arg1, arg2, res)); \
+}} while (0)
+
 // draw line connecting two points
 Line *Scope::join_line(Point &a, Point &b)
 {
@@ -52,8 +58,7 @@ Line *Scope::join_line(Point &a, Point &b)
         return nullptr;
 
     Line *l = new Line(a, b);
-    this->add(l); // TODO prefix AB
-    this->listener(Move<Point,Point,Line>(MoveType::straightedge, &a, &b, l));
+    _make_move(straightedge, &a, Point, &b, Point, l, Line);
 
     return l;
 }
@@ -65,8 +70,7 @@ Circle *Scope::join_circle(Point &a, Point &b)
         return nullptr;
 
     Circle *c = new Circle(a, b);
-    this->add(c); // TODO prefix A
-    this->listener(Move<Point,Point,Circle>(MoveType::compass, &a, &b, c));
+    _make_move(compass, &a, Point, &b, Point, c, Circle);
 
     return c;
 }
@@ -78,8 +82,7 @@ Point *Scope::meet(Line &a, Line &b)
         return nullptr;
 
     Point *p = a.meet(b);
-    this->add(p);
-    this->listener(Move<Line,Line,Point>(MoveType::meet, &a, &b, p));
+    _make_move(meet, &a, Line, &b, Line, p, Point);
 
     return p;
 }
@@ -92,14 +95,8 @@ pair<Point*,Point*> Scope::meet(Line &a, Circle &b)
 
     auto res = b.meet(a);
 
-    if (res.first != nullptr) {
-        this->add(res.first);
-        this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, res.first));
-    }
-    if (res.second != nullptr) {
-        this->add(res.second);
-        this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, res.second));
-    }
+    _make_move(meet, &a, Line, &b, Circle, res.first, Point);
+    _make_move(meet, &a, Line, &b, Circle, res.second, Point);
 
     return res;
 }
@@ -112,14 +109,10 @@ pair<Point*,Point*> Scope::meet(Circle &a, Circle &b)
 
     auto res = a.meet(b);
 
-    if (res.first != nullptr) {
-        this->add(res.first);
-        this->listener(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.first));
-    }
-    if (res.second != nullptr) {
-        this->add(res.second);
-        this->listener(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.second));
-    }
+    _make_move(meet, &a, Circle, &b, Circle, res.first, Point);
+    _make_move(meet, &a, Circle, &b, Circle, res.second, Point);
 
     return res;
 }
+
+#undef _make_move

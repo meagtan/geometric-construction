@@ -25,7 +25,7 @@ struct Point {
     bool operator==(const Point &other) const;
 };
 
-struct Circle;
+struct Circle; // forward declare for Line::meet(const Circle &)
 
 struct Line {
     const constr_num x_coeff, y_coeff, const_coeff; // x_coeff * x + y_coeff * y + const_coeff == 0

@@ -10,14 +10,12 @@ struct LineSegment : Line {
 
     LineSegment(const Point &start, const Point &end);
 
-    Point *shared_point(const LineSegment &other) const;
-
-    // TODO integrate these with Line by making meet a method of Line in core.h
-    //   and introducing a protected virtual function for Line that sets boundaries
-    Point *meet(const Line &other) const;
-    Point *meet(const LineSegment &other) const;
+    const Point *shared_point(const LineSegment &other) const;
 
     bool operator==(const LineSegment &other) const;
+
+protected:
+    bool within_boundary(const Point &a) const; // limit point to boundaries of line segment
 };
 
 struct Angle {
@@ -28,7 +26,10 @@ struct Angle {
     Angle(const Point &end1, const Point &vertex, const Point &end2);
     Angle(const Line &l1, const Line &l2, int region1, int region2);
 
-    constr_num measure() const; // measure in radians divided by 2 pi
+    bool share_vertex(const Angle &other) const;
+    const Line *shared_line(const Angle &other) const;
+    // perhaps more functions for intersections if the need arises
+
     constr_num sine() const; // sine of measure
     constr_num cosine() const; // cosine of measure
 
