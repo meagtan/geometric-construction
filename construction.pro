@@ -15,6 +15,6 @@ SOURCES += \
     src/main.cpp
 
 HEADERS += \
-    src/core/core.h \
-    src/num/constr_num.h \
-    src/core/geom.h
+    include/core.h \
+    include/constr_num.h \
+    include/geom.h

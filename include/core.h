@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "../num/constr_num.h"
+#include "constr_num.h"
 
 using std::vector;
 using std::pair;
