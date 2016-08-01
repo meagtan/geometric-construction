@@ -1,6 +1,6 @@
 #include "core.h"
 
-Scope::Scope() {}
+Scope::Scope(MoveListener *listener) : listener(listener) {}
 
 Scope::~Scope()
 {
@@ -54,7 +54,7 @@ Line *Scope::join_line(Point &a, Point &b, bool check_contains)
     Line *l = new Line(a, b);
     this->add(l); // TODO prefix AB
     if (check_contains)
-        this->moves.push_back(Move<Point,Point,Line>(MoveType::straightedge, &a, &b, l));
+        this->listener(Move<Point,Point,Line>(MoveType::straightedge, &a, &b, l));
     return l;
 }
 
@@ -67,7 +67,7 @@ Circle *Scope::join_circle(Point &a, Point &b, bool check_contains)
     Circle *c = new Circle(a, b);
     this->add(c); // TODO prefix A
     if (check_contains)
-        this->moves.push_back(Move<Point,Point,Circle>(MoveType::compass, &a, &b, c));
+        this->listener(Move<Point,Point,Circle>(MoveType::compass, &a, &b, c));
     return c;
 }
 
@@ -92,7 +92,7 @@ Point *Scope::meet(Line &a, Line &b, bool check_contains)
     Point* p = new Point(x, y);
     this->add(p); // TODO prefix
     if (check_contains)
-        this->moves.push_back(Move<Line,Line,Point>(MoveType::meet, &a, &b, p));
+        this->listener(Move<Line,Line,Point>(MoveType::meet, &a, &b, p));
     return p;
 }
 
@@ -112,7 +112,7 @@ pair<Point*,Point*> Scope::meet(Line &a, Circle &b, bool check_contains)
         p1 = new Point(x_offset, y_offset);
         this->add(p1);
         if (check_contains)
-            this->moves.push_back(Move<Line,Circle,Point>(MoveType::meet, &a, &b, p1));
+            this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, p1));
     } else if (discr > 0) {
         constr_num x_factor = a.y_coeff * sqrt(discr) / a.norm(),
                    y_factor = a.x_coeff * sqrt(discr) / a.norm();
@@ -124,8 +124,10 @@ pair<Point*,Point*> Scope::meet(Line &a, Circle &b, bool check_contains)
 
         this->add(p1); // TODO prefix
         this->add(p2); // TODO prefix
-        if (check_contains)
-            this->moves.push_back(Move<Line,Circle,pair<Point*,Point*>>(MoveType::meet, &a, &b, new pair<Point*,Point*>(p1, p2)));
+        if (check_contains) {
+            this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, p1));
+            this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, p2));
+        }
     }
 
     return pair<Point*,Point*>(p1, p2);
@@ -144,11 +146,16 @@ pair<Point*,Point*> Scope::meet(Circle &a, Circle &b, bool check_contains)
     pair<Point*,Point*> res = this->meet(l, a, false);
 
     if (check_contains) {
+        if (res.first != nullptr)
+            this->listener->receiveMove(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.first));
         if (res.second != nullptr)
-            this->moves.push_back(Move<Circle,Circle,pair<Point*,Point*>>(MoveType::meet, &a, &b, new pair<Point*,Point*>(res.first, res.second)));
-        else if (res.first != nullptr)
-            this->moves.push_back(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.first));
+            this->listener->receiveMove(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.second));
     }
 
     return res;
 }
+
+// TODO allow for more operations, add line segments (pair of points) and angles with appropriate methods and auxiliary constructions of
+//   bisections, translations, etc.
+
+// Send each move made into a listener object instead of a vector.
