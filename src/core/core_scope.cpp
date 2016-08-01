@@ -46,116 +46,80 @@ bool Scope::contains(Circle *c) const
 }
 
 // draw line connecting two points
-Line *Scope::join_line(Point &a, Point &b, bool check_contains)
+Line *Scope::join_line(Point &a, Point &b)
 {
-    if (check_contains && (!this->contains(&a) || !this->contains(&b)))
+    if (!this->contains(&a) || !this->contains(&b))
         return nullptr;
 
     Line *l = new Line(a, b);
     this->add(l); // TODO prefix AB
-    if (check_contains)
-        this->listener(Move<Point,Point,Line>(MoveType::straightedge, &a, &b, l));
+    this->listener(Move<Point,Point,Line>(MoveType::straightedge, &a, &b, l));
+
     return l;
 }
 
 // draw circle centered in a and touching b
-Circle *Scope::join_circle(Point &a, Point &b, bool check_contains)
+Circle *Scope::join_circle(Point &a, Point &b)
 {
-    if (check_contains && (!this->contains(&a) || !this->contains(&b)))
+    if (!this->contains(&a) || !this->contains(&b))
         return nullptr;
 
     Circle *c = new Circle(a, b);
     this->add(c); // TODO prefix A
-    if (check_contains)
-        this->listener(Move<Point,Point,Circle>(MoveType::compass, &a, &b, c));
+    this->listener(Move<Point,Point,Circle>(MoveType::compass, &a, &b, c));
+
     return c;
 }
 
-// TODO make meet check for containment, call a's own _meet method, and name and add the resulting points it gives
-
 // intersect two lines
-Point *Scope::meet(Line &a, Line &b, bool check_contains)
+Point *Scope::meet(Line &a, Line &b)
 {
-    if (check_contains && (!this->contains(&a) || !this->contains(&b)))
+    if (!this->contains(&a) || !this->contains(&b))
         return nullptr;
 
-    constr_num det = a.x_coeff * b.y_coeff - a.y_coeff * b.x_coeff;
+    Point *p = a.meet(b);
+    this->add(p);
+    this->listener(Move<Line,Line,Point>(MoveType::meet, &a, &b, p));
 
-    // parallel lines
-    if (det == 0)
-        return nullptr;
-
-    // might be neater with matrices
-    constr_num x = (a.const_coeff * b.y_coeff - a.y_coeff * b.const_coeff) / det,
-               y = (b.const_coeff * a.x_coeff - b.x_coeff * a.const_coeff) / det;
-
-    Point* p = new Point(x, y);
-    this->add(p); // TODO prefix
-    if (check_contains)
-        this->listener(Move<Line,Line,Point>(MoveType::meet, &a, &b, p));
     return p;
 }
 
 // intersect a line and a circle
-pair<Point*,Point*> Scope::meet(Line &a, Circle &b, bool check_contains)
+pair<Point*,Point*> Scope::meet(Line &a, Circle &b)
 {
-    if (check_contains && (!this->contains(&a) || !this->contains(&b)))
+    if (!this->contains(&a) || !this->contains(&b))
         return pair<Point*,Point*>(nullptr, nullptr);
 
-    constr_num value = a.value_at(b.center),
-               discr = b.radius * b.radius * a.norm() - value * value,
-               x_offset = b.center.x + a.x_coeff * value / a.norm(),
-               y_offset = b.center.y + a.y_coeff * value / a.norm();
-    Point *p1 = nullptr, *p2 = nullptr;
+    auto res = b.meet(a);
 
-    if (discr == 0) {
-        p1 = new Point(x_offset, y_offset);
-        this->add(p1);
-        if (check_contains)
-            this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, p1));
-    } else if (discr > 0) {
-        constr_num x_factor = a.y_coeff * sqrt(discr) / a.norm(),
-                   y_factor = a.x_coeff * sqrt(discr) / a.norm();
-
-        p1 = new Point(x_offset + x_factor,
-                       y_offset - y_factor);
-        p2 = new Point(x_offset - x_factor,
-                       y_offset + y_factor);
-
-        this->add(p1); // TODO prefix
-        this->add(p2); // TODO prefix
-        if (check_contains) {
-            this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, p1));
-            this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, p2));
-        }
+    if (res.first != nullptr) {
+        this->add(res.first);
+        this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, res.first));
     }
-
-    return pair<Point*,Point*>(p1, p2);
-}
-
-// intersect two circles
-pair<Point*,Point*> Scope::meet(Circle &a, Circle &b, bool check_contains)
-{
-    if (check_contains && (!this->contains(&a) || !this->contains(&b)))
-        return pair<Point*,Point*>(nullptr, nullptr);
-
-    Line l ((b.center.x - a.center.x) * 2,
-            (b.center.y - a.center.y) * 2,
-            a.value_at(origin) - b.value_at(origin));
-
-    pair<Point*,Point*> res = this->meet(l, a, false);
-
-    if (check_contains) {
-        if (res.first != nullptr)
-            this->listener(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.first));
-        if (res.second != nullptr)
-            this->listener(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.second));
+    if (res.second != nullptr) {
+        this->add(res.second);
+        this->listener(Move<Line,Circle,Point>(MoveType::meet, &a, &b, res.second));
     }
 
     return res;
 }
 
-// TODO allow for more operations, add line segments (pair of points) and angles with appropriate methods and auxiliary constructions of
-//   bisections, translations, etc.
+// intersect two circles
+pair<Point*,Point*> Scope::meet(Circle &a, Circle &b)
+{
+    if (!this->contains(&a) || !this->contains(&b))
+        return pair<Point*,Point*>(nullptr, nullptr);
 
-// Send each move made into a listener object instead of a vector.
+    auto res = a.meet(b);
+
+    if (res.first != nullptr) {
+        this->add(res.first);
+        this->listener(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.first));
+    }
+    if (res.second != nullptr) {
+        this->add(res.second);
+        this->listener(Move<Circle,Circle,Point>(MoveType::meet, &a, &b, res.second));
+    }
+
+    return res;
+}

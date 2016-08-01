@@ -25,6 +25,8 @@ struct Point {
     bool operator==(const Point &other) const;
 };
 
+struct Circle;
+
 struct Line {
     const constr_num x_coeff, y_coeff, const_coeff; // x_coeff * x + y_coeff * y + const_coeff == 0
 
@@ -42,6 +44,13 @@ struct Line {
     bool precedes(const Point &a, const Point &b) const;
 
     bool operator==(const Line &other) const;
+
+    Point *meet(const Line &other) const;
+    pair<Point*,Point*> meet(const Circle &other) const;
+
+protected:
+    // set boundaries to the points along the line that the object contains, to be overridden for line segments, etc.
+    virtual bool within_boundary(const Point &a) const;
 };
 
 struct Circle {
@@ -58,6 +67,13 @@ struct Circle {
     bool contains(const Point &a) const;
 
     bool operator==(const Circle &other) const;
+
+    pair<Point*,Point*> meet(const Line &other) const;
+    pair<Point*,Point*> meet(const Circle &other) const;
+
+protected:
+    // set boundaries to the points along the line that the object contains, to be overridden for arcs, etc.
+    virtual bool within_boundary(const Point &a) const;
 };
 
 struct _Move {};
@@ -98,12 +114,12 @@ public:
     bool contains(Line *l) const;
     bool contains(Circle *c) const;
 
-    Line *join_line(Point &a, Point &b, bool check_contains = true);
-    Circle *join_circle(Point &c, Point &o, bool check_contains = true);
+    Line *join_line(Point &a, Point &b);
+    Circle *join_circle(Point &c, Point &o);
 
-    Point *meet(Line &a, Line &b, bool check_contains = true);
-    pair<Point*,Point*> meet(Line &a, Circle &b, bool check_contains = true);
-    pair<Point*,Point*> meet(Circle &a, Circle &b, bool check_contains = true);
+    Point *meet(Line &a, Line &b);
+    pair<Point*,Point*> meet(Line &a, Circle &b);
+    pair<Point*,Point*> meet(Circle &a, Circle &b);
 };
 
 const Point origin = Point();

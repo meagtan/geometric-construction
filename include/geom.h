@@ -29,6 +29,8 @@ struct Angle {
     Angle(const Line &l1, const Line &l2, int region1, int region2);
 
     constr_num measure() const; // measure in radians divided by 2 pi
+    constr_num sine() const; // sine of measure
+    constr_num cosine() const; // cosine of measure
 
     bool operator==(const Angle &other) const;
 };

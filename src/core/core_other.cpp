@@ -42,7 +42,7 @@ constr_num Line::distance(const Point &a) const
 
 bool Line::contains(const Point &a) const
 {
-    return this->value_at(a) == 0;
+    return this->value_at(a) == 0 && this->within_boundary(a);
 }
 
 bool Line::precedes(const Point &a, const Point &b) const
@@ -55,6 +55,36 @@ bool Line::operator==(const Line &other) const
 {
     return this->x_coeff * other.const_coeff == this->const_coeff * other.x_coeff &&
            this->y_coeff * other.const_coeff == this->const_coeff * other.y_coeff;
+}
+
+Point *Line::meet(const Line &other) const
+{
+    constr_num det = this->x_coeff * other.y_coeff - this->y_coeff * other.x_coeff;
+
+    // parallel lines
+    if (det == 0)
+        return nullptr;
+
+    // might be neater with matrices
+    constr_num x = (this->const_coeff * other.y_coeff - this->y_coeff * other.const_coeff) / det,
+               y = (other.const_coeff * this->x_coeff - other.x_coeff * this->const_coeff) / det;
+
+    Point* p = new Point(x, y);
+
+    // check for boundaries for child classes
+    if (this->within_boundary(*p) && other.within_boundary(*p))
+        return p;
+    return nullptr;
+}
+
+pair<Point*,Point*> Line::meet(const Circle &other) const
+{
+    return other.meet(*this);
+}
+
+bool Line::within_boundary(const Point &a) const
+{
+    return true;
 }
 
 // Circle
@@ -80,12 +110,48 @@ constr_num Circle::value_at(const Point &a) const
 
 bool Circle::contains(const Point &a) const
 {
-    return this->value_at(a) == 0;
+    return this->value_at(a) == 0 && this->within_boundary(a);
 }
 
 bool Circle::operator==(const Circle &other) const
 {
     return this->center == other.center && this->radius == other.radius;
+}
+
+pair<Point*,Point*> Circle::meet(const Line &other) const
+{
+    constr_num value = other.value_at(this->center),
+               discr = this->radius * this->radius * other.norm() - value * value,
+               x_offset = this->center.x + other.x_coeff * value / other.norm(),
+               y_offset = this->center.y + other.y_coeff * value / other.norm();
+    Point *p1 = nullptr, *p2 = nullptr;
+
+    if (discr == 0) {
+        p1 = new Point(x_offset, y_offset);
+    } else if (discr > 0) {
+        constr_num x_factor = other.y_coeff * sqrt(discr) / other.norm(),
+                   y_factor = other.x_coeff * sqrt(discr) / other.norm();
+
+        p1 = new Point(x_offset + x_factor,
+                       y_offset - y_factor);
+        p2 = new Point(x_offset - x_factor,
+                       y_offset + y_factor);
+    }
+
+    return std::make_pair(p1, p2);
+}
+
+pair<Point*,Point*> Circle::meet(const Circle &other) const
+{
+    Line l ((other.center.x - this->center.x) * 2,
+            (other.center.y - this->center.y) * 2,
+            this->value_at(origin) - other.value_at(origin));
+    return this->meet(l);
+}
+
+bool Circle::within_boundary(const Point &a) const
+{
+    return true;
 }
 
 // Moves
