@@ -14,7 +14,8 @@ SOURCES += \
     src/core/core_scope.cpp \
     src/main.cpp \
     src/core/geom.cpp \
-    src/core/constructor.cpp
+    src/core/constructor.cpp \
+    src/core/constr_num.cpp
 
 HEADERS += \
     include/core.h \

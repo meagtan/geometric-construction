@@ -20,7 +20,7 @@ void Constructor::add(const Angle *a)
     if (res != nullptr) {                                                                     \
         Scope::add(res);                                                                       \
         Scope::listener(Move<arg1type,arg2type,restype>(MoveType::movetype, arg1, arg2, res)); \
-}} while (0)
+    }} while (0)
 
 const LineSegment *Constructor::join_segment(const Point &a, const Point &b)
 {
@@ -146,3 +146,15 @@ const Angle *Constructor::translate(const Angle &a, const Point &p)
 }
 
 #undef _ratio
+
+const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
+{
+    // TODO
+    // - Translate l to the vertex of a, call the new segment l1
+    // - Draw circle with center l1.start and touching l1.end
+    // - Pick the meets p1 and p2 of the circle with a.l1 and a.l2 that lie in a.region1 and a.region2
+    // - Find perpendicular bisector to l1.end and p2
+    // - Reflect p1 around the bisector
+    // - Connect l1.start with p1 and translate the new line segment back to l.start
+    return nullptr;
+}

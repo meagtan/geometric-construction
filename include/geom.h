@@ -42,8 +42,8 @@ struct Angle {
 class Constructor : public Scope {
 protected:
     vector<const Angle*> angles;
-public:
 
+public:
     Constructor(MoveListener listener);
 
     bool contains(const Angle *a) const;
@@ -51,8 +51,6 @@ public:
 
     const LineSegment *join_segment(const Point &a, const Point &b);
     const Angle *join_angle(const Point &end1, const Point &vertex, const Point &end2);
-
-    // include more operations on line segments and angles, such as bisection, intersection, perpendiculars
 
     // the perpendicular/parallel to l going through p
     const Line *perpendicular(const Line &l, const Point &p);
@@ -64,14 +62,20 @@ public:
     // move the vertex of a to p
     const Angle *translate(const Angle &a, const Point &p);
 
-    const LineSegment *rotate(const LineSegment &l, const Angle &a);
-
     const Angle *add(const Angle &a, const Angle &b);
     const Angle *multiply(const Angle &a, int n);
 
     const Line *bisect(const Point &a, const Point &b);
     const Line *bisect(const LineSegment &l);
     const Line *bisect(const Angle &a);
+
+    const Point *reflect(const Point &a, const Point &pivot);
+    const Point *reflect(const Point &a, const Line &pivot);
+    const Line *reflect(const Line &a, const Point &pivot);
+    const Line *reflect(const Line &a, const Line &pivot);
+
+    const Line *rotate(const Line &l, const Angle &a, const Point &pivot);
+    const LineSegment *rotate(const LineSegment &l, const Angle &a);
 };
 
 #endif // GEOM_H
