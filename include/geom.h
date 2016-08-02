@@ -40,8 +40,17 @@ struct Angle {
 
 // stores useful compositions of elementary moves
 class Constructor : public Scope {
+protected:
+    vector<const Angle*> angles;
+public:
 
     Constructor(MoveListener listener);
+
+    bool contains(const Angle *a) const;
+    void add(const Angle *a);
+
+    const LineSegment *join_segment(const Point &a, const Point &b);
+    const Angle *join_angle(const Point &end1, const Point &vertex, const Point &end2);
 
     // include more operations on line segments and angles, such as bisection, intersection, perpendiculars
 

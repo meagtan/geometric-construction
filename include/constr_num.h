@@ -27,5 +27,6 @@ public:
 
 constr_num sqrt(const constr_num &a);
 constr_num abs(const constr_num &a);
+int sgn(const constr_num &a);
 
 #endif // CONSTR_NUM_H

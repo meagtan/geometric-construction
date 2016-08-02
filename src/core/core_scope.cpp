@@ -30,39 +30,39 @@ Scope::~Scope()
 
 void Scope::add(const Point *a)
 {
-    points.push_back(a);
+    if (!contains(a))
+        points.push_back(a);
 }
 
 void Scope::add(const Line *l)
 {
-    lines.push_back(l);
+    if (!contains(l))
+        lines.push_back(l);
 }
 
 void Scope::add(const Circle *c)
 {
-    circles.push_back(c);
+    if (!contains(c))
+        circles.push_back(c);
 }
 
 bool Scope::contains(const Point *a) const
 {
-    if (a == nullptr)
-        return 0;
-    return (auto_construct_ints && a->x.is_int() && a->y.is_int()) ||
-           std::count_if(points.begin(), points.end(), [a](const Point *p) {return *p == *a; });
+    return a != nullptr &&
+           ((auto_construct_ints && a->x.is_int() && a->y.is_int()) ||
+            std::count_if(points.begin(), points.end(), [a](const Point *p) {return *p == *a; }));
 }
 
 bool Scope::contains(const Line *l) const
 {
-    if (l == nullptr)
-        return 0;
-    return std::count_if(lines.begin(), lines.end(), [l](const Line *p) {return *p == *l; });
+    return l != nullptr &&
+           std::count_if(lines.begin(), lines.end(), [l](const Line *p) {return *p == *l; });
 }
 
 bool Scope::contains(const Circle *c) const
 {
-    if (c == nullptr)
-        return 0;
-    return std::count_if(circles.begin(), circles.end(), [c](const Circle *p) {return *p == *c; });
+    return c != nullptr &&
+           std::count_if(circles.begin(), circles.end(), [c](const Circle *p) {return *p == *c; });
 }
 
 #define _make_move(movetype, arg1, arg1type, arg2, arg2type, res, restype) do {               \
