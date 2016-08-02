@@ -1,6 +1,20 @@
 #include "include/core.h"
 
-Scope::Scope(MoveListener listener) : listener(listener) {}
+// Moves
+
+template<typename T1, typename T2, typename R>
+Move<T1,T2,R>::Move(const MoveType move, const T1 *arg1, const T2 *arg2, const R *result) :
+    move(move), arg1(arg1), arg2(arg2), result(result) {}
+
+// Scope
+
+Scope::Scope(MoveListener listener) : listener(listener)
+{
+    add(origin);
+    add(unit_x);
+    add(x_axis);
+    add(y_axis);
+}
 
 Scope::~Scope()
 {
@@ -14,84 +28,90 @@ Scope::~Scope()
 
 // TODO do not add already existing points, lines and circles
 
-void Scope::add(Point *a)
+void Scope::add(const Point *a)
 {
-    this->points.push_back(a);
+    points.push_back(a);
 }
 
-void Scope::add(Line *l)
+void Scope::add(const Line *l)
 {
-    this->lines.push_back(l);
+    lines.push_back(l);
 }
 
-void Scope::add(Circle *c)
+void Scope::add(const Circle *c)
 {
-    this->circles.push_back(c);
+    circles.push_back(c);
 }
 
-bool Scope::contains(Point *a) const
+bool Scope::contains(const Point *a) const
 {
+    if (a == nullptr)
+        return 0;
     return (auto_construct_ints && a->x.is_int() && a->y.is_int()) ||
-           std::count(this->points.begin(), this->points.end(), a);
+           std::count_if(points.begin(), points.end(), [a](const Point *p) {return *p == *a; });
 }
 
-bool Scope::contains(Line *l) const
+bool Scope::contains(const Line *l) const
 {
-    return std::count(this->lines.begin(), this->lines.end(), l);
+    if (l == nullptr)
+        return 0;
+    return std::count_if(lines.begin(), lines.end(), [l](const Line *p) {return *p == *l; });
 }
 
-bool Scope::contains(Circle *c) const
+bool Scope::contains(const Circle *c) const
 {
-    return std::count(this->circles.begin(), this->circles.end(), c);
+    if (c == nullptr)
+        return 0;
+    return std::count_if(circles.begin(), circles.end(), [c](const Circle *p) {return *p == *c; });
 }
 
 #define _make_move(movetype, arg1, arg1type, arg2, arg2type, res, restype) do {               \
     if (res != nullptr) {                                                                     \
-        this->add(res);                                                                       \
-        this->listener(Move<arg1type,arg2type,restype>(MoveType::movetype, arg1, arg2, res)); \
+        add(res);                                                                       \
+        listener(Move<arg1type,arg2type,restype>(MoveType::movetype, arg1, arg2, res)); \
 }} while (0)
 
 // draw line connecting two points
-Line *Scope::join_line(Point &a, Point &b)
+const Line *Scope::join_line(const Point &a, const Point &b)
 {
-    if (!this->contains(&a) || !this->contains(&b))
+    if (!contains(&a) || !contains(&b))
         return nullptr;
 
-    Line *l = new Line(a, b);
+    const Line *l = new Line(a, b);
     _make_move(straightedge, &a, Point, &b, Point, l, Line);
 
     return l;
 }
 
 // draw circle centered in a and touching b
-Circle *Scope::join_circle(Point &a, Point &b)
+const Circle *Scope::join_circle(const Point &a, const Point &b)
 {
-    if (!this->contains(&a) || !this->contains(&b))
+    if (!contains(&a) || !contains(&b))
         return nullptr;
 
-    Circle *c = new Circle(a, b);
+    const Circle *c = new Circle(a, b);
     _make_move(compass, &a, Point, &b, Point, c, Circle);
 
     return c;
 }
 
 // intersect two lines
-Point *Scope::meet(Line &a, Line &b)
+const Point *Scope::meet(const Line &a, const Line &b)
 {
-    if (!this->contains(&a) || !this->contains(&b))
+    if (!contains(&a) || !contains(&b))
         return nullptr;
 
-    Point *p = a.meet(b);
+    const Point *p = a.meet(b);
     _make_move(meet, &a, Line, &b, Line, p, Point);
 
     return p;
 }
 
 // intersect a line and a circle
-pair<Point*,Point*> Scope::meet(Line &a, Circle &b)
+pair<const Point*,const Point*> Scope::meet(const Line &a, const Circle &b)
 {
-    if (!this->contains(&a) || !this->contains(&b))
-        return pair<Point*,Point*>(nullptr, nullptr);
+    if (!contains(&a) || !contains(&b))
+        return pair<const Point*,const Point*>(nullptr, nullptr);
 
     auto res = b.meet(a);
 
@@ -102,9 +122,9 @@ pair<Point*,Point*> Scope::meet(Line &a, Circle &b)
 }
 
 // intersect two circles
-pair<Point*,Point*> Scope::meet(Circle &a, Circle &b)
+pair<const Point*,const Point*> Scope::meet(const Circle &a, const Circle &b)
 {
-    if (!this->contains(&a) || !this->contains(&b))
+    if (!contains(&a) || !contains(&b))
         return pair<Point*,Point*>(nullptr, nullptr);
 
     auto res = a.meet(b);

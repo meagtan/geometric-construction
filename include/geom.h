@@ -14,6 +14,8 @@ struct LineSegment : Line {
 
     bool operator==(const LineSegment &other) const;
 
+    constr_num length() const;
+
 protected:
     bool within_boundary(const Point &a) const; // limit point to boundaries of line segment
 };
@@ -39,28 +41,28 @@ struct Angle {
 // stores useful compositions of elementary moves
 class Constructor : public Scope {
 
-    Constructor(MoveListener *listener);
+    Constructor(MoveListener listener);
 
     // include more operations on line segments and angles, such as bisection, intersection, perpendiculars
 
     // the perpendicular/parallel to l going through p
-    Line *perpendicular(const Line &l, const Point &p);
-    Line *parallel(const Line &l, const Point &p);
+    const Line *perpendicular(const Line &l, const Point &p);
+    const Line *parallel(const Line &l, const Point &p);
 
     // translate line segment to the given starting point
-    LineSegment *translate(const LineSegment &l, const Point &start);
+    const LineSegment *translate(const LineSegment &l, const Point &start);
 
     // move the vertex of a to p
-    Angle *translate(const Angle &a, const Point &p);
+    const Angle *translate(const Angle &a, const Point &p);
 
-    LineSegment *rotate(const LineSegment &l, const Angle &a);
+    const LineSegment *rotate(const LineSegment &l, const Angle &a);
 
-    Angle *add(const Angle &a, const Angle &b);
-    Angle *multiply(const Angle &a, int n);
+    const Angle *add(const Angle &a, const Angle &b);
+    const Angle *multiply(const Angle &a, int n);
 
-    Line *bisect(const Point &a, const Point &b);
-    Line *bisect(const LineSegment &l);
-    Line *bisect(const Angle &a);
+    const Line *bisect(const Point &a, const Point &b);
+    const Line *bisect(const LineSegment &l);
+    const Line *bisect(const Angle &a);
 };
 
 #endif // GEOM_H

@@ -13,7 +13,8 @@ SOURCES += \
     src/core/core_other.cpp \
     src/core/core_scope.cpp \
     src/main.cpp \
-    src/core/geom.cpp
+    src/core/geom.cpp \
+    src/core/constructor.cpp
 
 HEADERS += \
     include/core.h \
