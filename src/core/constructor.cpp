@@ -256,6 +256,21 @@ const Line *Constructor::reflect(const Line &a, const Line &pivot)
     return join_line(*vertex, *p);
 }
 
+const Line *Constructor::rotate(const Line &l, const Angle &a, const Point &pivot)
+{
+    // find bisector of angle
+    const Line *l1 = bisect(a);
+    if (l1 == nullptr)
+        return nullptr;
+
+    // get parallel of bisector at pivot
+    l1 = parallel(*l1, pivot);
+    assert(l1 != nullptr);
+
+    // reflect line around parallel
+    return reflect(l, *l1);
+}
+
 const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
 {
     // - Translate l to the vertex of a, call the new segment l1
