@@ -66,6 +66,9 @@ public:
     const Line *bisect(const LineSegment &l); // perpendicular bisector of l
     const Line *bisect(const Angle &a); // bisector of the angle going through the vertex
 
+    const Point *midpoint(const Point &a, const Point &b);
+    const Point *midpoint(const LineSegment &a);
+
     const Point *reflect(const Point &a, const Point &pivot);
     const Point *reflect(const Point &a, const Line &pivot);
     const Line *reflect(const Line &a, const Point &pivot);

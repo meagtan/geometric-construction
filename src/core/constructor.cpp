@@ -187,6 +187,20 @@ const Line *Constructor::bisect(const Angle &a)
     return join_line(*p1, *p2);
 }
 
+const Point *Constructor::midpoint(const Point &a, const Point &b)
+{
+    const Line *l1 = join_line(a, b),
+               *l2 = bisect(a, b);
+    if (l1 == nullptr || l2 == nullptr)
+        return nullptr;
+    return meet(*l1, *l2);
+}
+
+const Point *Constructor::midpoint(const LineSegment &a)
+{
+    return midpoint(a.start, a.end);
+}
+
 const Point *Constructor::reflect(const Point &a, const Point &pivot)
 {
     const Line *l = join_line(a, pivot);
