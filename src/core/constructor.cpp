@@ -151,9 +151,9 @@ const Line *Constructor::bisect(const Point &a, const Point &b)
 {
     const Circle *c1 = join_circle(a, b),
                  *c2 = join_circle(b, a);
+
     if (c1 == nullptr || c2 == nullptr || c1 == c2)
         return nullptr;
-
     auto _meet = meet(*c1, *c2);
     assert(_meet.first != nullptr);
     assert(_meet.second != nullptr);
@@ -185,6 +185,75 @@ const Line *Constructor::bisect(const Angle &a)
 
     const Point *p2 = a.l1.precedes(a.vertex, *p1) == a.l1.precedes(a.vertex, *_meet.first) ? _meet.first : _meet.second;
     return join_line(*p1, *p2);
+}
+
+const Point *Constructor::reflect(const Point &a, const Point &pivot)
+{
+    const Line *l = join_line(a, pivot);
+    const Circle *c = join_circle(pivot, a);
+    auto _meet = meet(*l, *c);
+
+    if (_meet.first == nullptr || _meet.second == nullptr)
+        return nullptr;
+
+    return *_meet.first == a ? _meet.second : _meet.first;
+}
+
+const Point *Constructor::reflect(const Point &a, const Line &pivot)
+{
+    const Line &p (pivot), // override within_boundary
+               *l = perpendicular(p, a);
+
+    if (l == nullptr)
+        return nullptr;
+    const Point *c = meet(p, *l);
+
+    if (c == nullptr)
+        return nullptr;
+    return reflect(a, *c);
+}
+
+const Line *Constructor::reflect(const Line &a, const Point &pivot)
+{
+    const Line &l (a),
+               *p = perpendicular(l, pivot);
+
+    if (p == nullptr)
+        return nullptr;
+    const Point *b = reflect(*meet(l, *p), pivot);
+
+    if (b == nullptr)
+        return nullptr;
+    return perpendicular(*p, *b);
+}
+
+const Line *Constructor::reflect(const Line &a, const Line &pivot)
+{
+    // different cases for a and pivot being parallel or not
+    const Point *vertex = meet(a, pivot), *p1 = nullptr;
+
+    if (vertex == nullptr) { // parallel
+        // find point on pivot
+        for (auto *p : points)
+            if (pivot.contains(*p)) { p1 = p; break; }
+        assert(p1 != nullptr);
+
+        // reflect a by p1
+        return reflect(a, *p1);
+    }
+    // not parallel
+
+    // find point on a
+    for (auto *p : points)
+        if (a.contains(*p) && *p != *vertex) { p1 = p; break; }
+    assert(p1 != nullptr);
+
+    // reflect p1 around pivot
+    const Point *p = reflect(*p1, pivot);
+
+    if (p == nullptr)
+        return nullptr;
+    return join_line(*vertex, *p);
 }
 
 const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
