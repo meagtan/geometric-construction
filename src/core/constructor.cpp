@@ -260,8 +260,7 @@ const Line *Constructor::rotate(const Line &l, const Angle &a, const Point &pivo
 {
     // find bisector of angle
     const Line *l1 = bisect(a);
-    if (l1 == nullptr)
-        return nullptr;
+    assert(l1 != nullptr);
 
     // get parallel of bisector at pivot
     l1 = parallel(*l1, pivot);
@@ -273,6 +272,22 @@ const Line *Constructor::rotate(const Line &l, const Angle &a, const Point &pivo
 
 const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
 {
+    // find bisector of angle
+    const Line *l1 = bisect(a);
+    if (l1 == nullptr) return nullptr;
+
+    // get parallel of bisector at l.start
+    l1 = parallel(*l1, l.start);
+    if (l1 == nullptr) return nullptr;
+
+    // reflect end around parallel
+    const Point *end = reflect(l.end, *l1);
+    if (end == nullptr) return nullptr;
+
+    // connect start and end
+    return join_segment(l.start, *end);
+
+    /* Awful previous algorithm:
     // - Translate l to the vertex of a, call the new segment l1
     const LineSegment *l1 = translate(l, a.vertex);
 
@@ -302,4 +317,5 @@ const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
     assert(l3 != nullptr);
 
     return translate(*l3, l.start);
+    */
 }
