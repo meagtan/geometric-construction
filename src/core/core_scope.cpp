@@ -26,7 +26,9 @@ Scope::~Scope()
         delete p;
 }
 
-// TODO do not add already existing points, lines and circles
+// TODO Scope::add should not check Scope::contains, but only if points contains the given pointer
+//   e.g. for points considered to be contained but not really in points
+// Then Scope::add should be called by join_line and join_circle
 
 void Scope::add(const Point *a)
 {

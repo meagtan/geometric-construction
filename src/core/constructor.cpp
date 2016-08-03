@@ -258,12 +258,33 @@ const Line *Constructor::reflect(const Line &a, const Line &pivot)
 
 const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
 {
-    // TODO
     // - Translate l to the vertex of a, call the new segment l1
+    const LineSegment *l1 = translate(l, a.vertex);
+
     // - Draw circle with center l1.start and touching l1.end
+    if (l1 == nullptr)
+        return nullptr;
+    const Circle *c = join_circle(l1->start, l1->end);
+
     // - Pick the meets p1 and p2 of the circle with a.l1 and a.l2 that lie in a.region1 and a.region2
+    auto meet1 = meet(a.l1, *c),
+         meet2 = meet(a.l2, *c);
+    assert(meet1.second != nullptr);
+    assert(meet2.second != nullptr);
+    const Point *p1 = a.l1.precedes(a.vertex, *meet1.first) == (a.region1 > 0) ? meet1.first : meet1.second,
+                *p2 = a.l2.precedes(a.vertex, *meet2.first) == (a.region2 > 0) ? meet2.first : meet2.second;
+
     // - Find perpendicular bisector to l1.end and p2
+    const Line *l2 = bisect(l1->end, *p2);
+    assert(l2 != nullptr);
+
     // - Reflect p1 around the bisector
+    const Point *p = reflect(*p1, *l2);
+    assert(p != nullptr);
+
     // - Connect l1.start with p1 and translate the new line segment back to l.start
-    return nullptr;
+    const LineSegment *l3 = join_segment(l1->start, *p);
+    assert(l3 != nullptr);
+
+    return translate(*l3, l.start);
 }
