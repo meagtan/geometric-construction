@@ -29,7 +29,7 @@ const LineSegment *Constructor::join_segment(const Point &a, const Point &b)
 
     const LineSegment *res = new LineSegment(a, b);
     Scope::add(res);
-    _make_move(straightedge, &a, Point, &b, Point, res, LineSegment);
+    _make_move(straightedge, &a, Point, &b, Point, res, Line);
     return res;
 }
 
@@ -146,6 +146,46 @@ const Angle *Constructor::translate(const Angle &a, const Point &p)
 }
 
 #undef _ratio
+
+const Line *Constructor::bisect(const Point &a, const Point &b)
+{
+    const Circle *c1 = join_circle(a, b),
+                 *c2 = join_circle(b, a);
+    if (c1 == nullptr || c2 == nullptr || c1 == c2)
+        return nullptr;
+
+    auto _meet = meet(*c1, *c2);
+    assert(_meet.first != nullptr);
+    assert(_meet.second != nullptr);
+
+    return join_line(*_meet.first, *_meet.second);
+}
+
+const Line *Constructor::bisect(const LineSegment &l)
+{
+    return bisect(l.start, l.end);
+}
+
+const Line *Constructor::bisect(const Angle &a)
+{
+    if (a.l1 == a.l2)
+        return &a.l1;
+
+    // find point on l1 other than vertex
+    const Point *p1 = nullptr;
+    for (auto *p : points)
+        if (a.l1.contains(*p) && *p != a.vertex) { p1 = p; break; }
+    assert(p1 != nullptr);
+
+    // find point on l2 with same region as p1
+    const Circle *c = join_circle(a.vertex, *p1);
+    auto _meet = meet(a.l2, *c);
+    assert(_meet.first != nullptr);
+    assert(_meet.second != nullptr);
+
+    const Point *p2 = a.l1.precedes(a.vertex, *p1) == a.l1.precedes(a.vertex, *_meet.first) ? _meet.first : _meet.second;
+    return join_line(*p1, *p2);
+}
 
 const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
 {

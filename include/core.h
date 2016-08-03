@@ -129,8 +129,9 @@ public:
     pair<const Point*,const Point*> meet(const Circle &a, const Circle &b);
 };
 
-const Point *origin = new Point(), *unit_x = new Point(1);
-const Line  *x_axis = new Line(0, 1, 0),
-            *y_axis = new Line(1, 0, 0);
+const Point * const origin = new Point(),
+            * const unit_x = new Point(1);
+const Line  * const x_axis = new Line(0, 1, 0),
+            * const y_axis = new Line(1, 0, 0);
 
 #endif // CORE_H

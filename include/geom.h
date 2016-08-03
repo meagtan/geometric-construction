@@ -62,12 +62,9 @@ public:
     // move the vertex of a to p
     const Angle *translate(const Angle &a, const Point &p);
 
-    const Angle *add(const Angle &a, const Angle &b);
-    const Angle *multiply(const Angle &a, int n);
-
-    const Line *bisect(const Point &a, const Point &b);
-    const Line *bisect(const LineSegment &l);
-    const Line *bisect(const Angle &a);
+    const Line *bisect(const Point &a, const Point &b); // perpendicular bisector between a and b
+    const Line *bisect(const LineSegment &l); // perpendicular bisector of l
+    const Line *bisect(const Angle &a); // bisector of the angle going through the vertex
 
     const Point *reflect(const Point &a, const Point &pivot);
     const Point *reflect(const Point &a, const Line &pivot);
@@ -76,6 +73,9 @@ public:
 
     const Line *rotate(const Line &l, const Angle &a, const Point &pivot);
     const LineSegment *rotate(const LineSegment &l, const Angle &a);
+
+    const Angle *add(const Angle &a, const Angle &b);
+    const Angle *multiply(const Angle &a, int n);
 };
 
 #endif // GEOM_H
