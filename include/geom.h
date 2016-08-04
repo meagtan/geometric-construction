@@ -45,6 +45,7 @@ protected:
 
 public:
     Constructor(MoveListener listener);
+    ~Constructor();
 
     bool contains(const Angle *a) const;
     void add(const Angle *a);
