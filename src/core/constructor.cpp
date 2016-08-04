@@ -8,7 +8,6 @@ Constructor::~Constructor()
 {
     for (auto *a : angles)
         delete a;
-    Scope::~Scope();
 }
 
 bool Constructor::contains(const Angle *a) const
