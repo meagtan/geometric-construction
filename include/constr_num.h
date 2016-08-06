@@ -3,7 +3,7 @@
 
 // Constructible numbers
 class constr_num {
-    struct expr {
+    struct Expr {
         enum {
             constant,
             unary,
@@ -13,23 +13,30 @@ class constr_num {
             int constant;
             struct {
                 enum {
-                    neg,
-                    inv,
-                    sqrt
+                    neg  = 1,
+                    inv  = 2,
+                    sqrt = 4
                 } op;
-                expr *arg;
+                Expr *arg;
             } unary;
             struct {
                 enum {
-                    add,
-                    mul
+                    add = 1,
+                    mul = 2
                 } op;
-                expr *arg1, *arg2;
+                Expr *arg1, *arg2;
             } binary;
         } expr_union;
+        ~Expr();
     } *expr;
 
-    constr_num(struct expr *expr);
+    constr_num(Expr *expr);
+
+    double value(Expr *expr) const;
+    double apply_unary(int op, double arg) const;
+    double apply_binary(int op, double arg1, double arg2) const;
+
+    constr_num inv() const;
 
 public:
     constr_num(int value = 0);
