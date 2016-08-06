@@ -1,6 +1,10 @@
 #ifndef CONSTR_NUM_H
 #define CONSTR_NUM_H
 
+#include <string>
+
+using std::string;
+
 // Constructible numbers
 class constr_num {
     struct Expr {
@@ -38,13 +42,19 @@ class constr_num {
 
     constr_num inv() const;
 
+    Expr *copy(Expr *expr) const;
+
 public:
     constr_num(int value = 0);
+    constr_num(string str);
+    constr_num(const constr_num &other);
     ~constr_num();
 
     double value() const;
 
     bool is_int() const;
+
+    constr_num &operator=(const constr_num &a);
 
     constr_num operator-() const;
 

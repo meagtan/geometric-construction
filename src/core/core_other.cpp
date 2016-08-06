@@ -91,7 +91,7 @@ pair<const Point*,const Point*> Line::meet(const Circle &other) const
     return other.meet(*this);
 }
 
-bool Line::within_boundary(const Point &a) const
+bool Line::within_boundary(const Point &) const
 {
     return true;
 }
@@ -163,7 +163,7 @@ pair<const Point*,const Point*> Circle::meet(const Circle &other) const
     return meet(l);
 }
 
-bool Circle::within_boundary(const Point &a) const
+bool Circle::within_boundary(const Point &) const
 {
     return true;
 }

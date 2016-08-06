@@ -8,7 +8,41 @@ constr_num::constr_num(int value)
     expr->expr_union.constant = value;
 }
 
-constr_num::constr_num(Expr *expr) : expr(expr) {}
+constr_num::constr_num(Expr *expr) : expr(expr) {} // TODO copy semantics
+
+constr_num::constr_num(string str)
+{
+    // TODO shunting yard algorithm
+}
+
+constr_num::constr_num(const constr_num &other)
+{
+    expr = copy(other.expr);
+}
+
+constr_num::Expr *constr_num::copy(Expr *expr) const
+{
+    if (expr == nullptr)
+        return nullptr;
+
+    Expr *res = new Expr();
+
+    if (expr->type == Expr::constant) {
+        res->type = Expr::constant;
+        res->expr_union.constant = expr->expr_union.constant;
+    } else if (expr->type == Expr::unary) {
+        res->type = Expr::unary;
+        res->expr_union.unary.op  = expr->expr_union.unary.op;
+        res->expr_union.unary.arg = copy(expr->expr_union.unary.arg);
+    } else {
+        res->type = Expr::binary;
+        res->expr_union.binary.op   = expr->expr_union.binary.op;
+        res->expr_union.binary.arg1 = copy(expr->expr_union.binary.arg1);
+        res->expr_union.binary.arg2 = copy(expr->expr_union.binary.arg2);
+    }
+
+    return res;
+}
 
 constr_num::~constr_num()
 {
@@ -62,6 +96,16 @@ double constr_num::apply_binary(int op, double arg1, double arg2) const
     if (op & 1) // add
         return arg1 + arg2;
     return arg1 * arg2;
+}
+
+constr_num &constr_num::operator=(const constr_num &a)
+{
+    if (this != &a) {
+        delete expr;
+        expr = copy(a.expr);
+    }
+
+    return *this;
 }
 
 constr_num constr_num::operator-() const

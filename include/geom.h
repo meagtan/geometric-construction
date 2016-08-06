@@ -9,6 +9,7 @@ struct LineSegment : Line {
     const Point &start, &end;
 
     LineSegment(const Point &start, const Point &end);
+    ~LineSegment() = default;
 
     const Point *shared_point(const LineSegment &other) const;
 
@@ -27,6 +28,7 @@ struct Angle {
 
     Angle(const Point &end1, const Point &vertex, const Point &end2);
     Angle(const Line &l1, const Line &l2, int region1, int region2);
+    ~Angle() = default;
 
     bool share_vertex(const Angle &other) const;
     const Line *shared_line(const Angle &other) const;

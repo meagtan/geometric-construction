@@ -2,13 +2,11 @@
 #define CORE_H
 
 #include <vector>
-#include <string>
 #include <algorithm>
 #include "constr_num.h"
 
 using std::vector;
 using std::pair;
-using std::string;
 
 // consider all integers already constructed
 constexpr bool auto_construct_ints = true;
