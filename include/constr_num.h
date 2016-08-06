@@ -3,11 +3,39 @@
 
 // Constructible numbers
 class constr_num {
-    int value; // for test only, change later
+    struct expr {
+        enum {
+            constant,
+            unary,
+            binary
+        } type;
+        union {
+            int constant;
+            struct {
+                enum {
+                    neg,
+                    inv,
+                    sqrt
+                } op;
+                expr *arg;
+            } unary;
+            struct {
+                enum {
+                    add,
+                    mul
+                } op;
+                expr *arg1, *arg2;
+            } binary;
+        } expr_union;
+    } *expr;
+
+    constr_num(struct expr *expr);
+
 public:
     constr_num(int value = 0);
+    ~constr_num();
 
-    // TODO
+    double value() const;
 
     bool is_int() const;
 
