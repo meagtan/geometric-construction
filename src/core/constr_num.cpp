@@ -1,5 +1,5 @@
 #include "include/constr_num.h"
-#include <math.h>
+#include <cmath>
 
 constr_num::constr_num(int value)
 {
@@ -9,11 +9,6 @@ constr_num::constr_num(int value)
 }
 
 constr_num::constr_num(Expr *expr) : expr(expr) {} // TODO copy semantics
-
-constr_num::constr_num(string str)
-{
-    // TODO shunting yard algorithm
-}
 
 constr_num::constr_num(const constr_num &other)
 {
@@ -84,15 +79,21 @@ double constr_num::value(Expr *expr) const
 
 double constr_num::apply_unary(int op, double arg) const
 {
+    if (isnan(arg))
+        return NAN;
+
     if (op & 1) // neg
         return -arg;
     if (op & 2) // inv
-        return 1 / arg;
-    return sqrt(arg);
+        return arg == 0 ? NAN : 1 / arg;
+    return arg < 0 ? NAN : sqrt(arg);
 }
 
 double constr_num::apply_binary(int op, double arg1, double arg2) const
 {
+    if (isnan(arg1) || isnan(arg2))
+        return NAN;
+
     if (op & 1) // add
         return arg1 + arg2;
     return arg1 * arg2;
@@ -113,7 +114,7 @@ constr_num constr_num::operator-() const
     Expr *e = new Expr();
     e->type = Expr::unary;
     e->expr_union.unary.op = e->expr_union.unary.neg;
-    e->expr_union.unary.arg = expr;
+    e->expr_union.unary.arg = copy(expr);
     return constr_num(e);
 }
 
@@ -122,8 +123,8 @@ constr_num constr_num::operator+(const constr_num &a) const
     Expr *e = new Expr();
     e->type = Expr::binary;
     e->expr_union.binary.op = e->expr_union.binary.add;
-    e->expr_union.binary.arg1 = expr;
-    e->expr_union.binary.arg2 = a.expr;
+    e->expr_union.binary.arg1 = copy(expr);
+    e->expr_union.binary.arg2 = copy(a.expr);
     return constr_num(e);
 }
 
@@ -137,8 +138,8 @@ constr_num constr_num::operator*(const constr_num &a) const
     Expr *e = new Expr();
     e->type = Expr::binary;
     e->expr_union.binary.op = e->expr_union.binary.mul;
-    e->expr_union.binary.arg1 = expr;
-    e->expr_union.binary.arg2 = a.expr;
+    e->expr_union.binary.arg1 = copy(expr);
+    e->expr_union.binary.arg2 = copy(a.expr);
     return constr_num(e);
 }
 
@@ -152,7 +153,7 @@ constr_num constr_num::inv() const
     Expr *e = new Expr();
     e->type = Expr::unary;
     e->expr_union.unary.op = e->expr_union.unary.inv;
-    e->expr_union.unary.arg = expr;
+    e->expr_union.unary.arg = copy(expr);
     return constr_num(e);
 }
 
@@ -186,12 +187,42 @@ bool constr_num::operator>=(const constr_num &a) const
     return value() >= a.value();
 }
 
+ostream &operator<<(ostream &s, const constr_num &a)
+{
+    a.print(s, a.expr);
+    return s;
+}
+
+// quick hack
+void constr_num::print(ostream &s, Expr *expr) const
+{
+    if (expr->type == Expr::constant) {
+        s << expr->expr_union.constant;
+    } else if (expr->type == Expr::unary) {
+        if (expr->expr_union.unary.op & 1)
+            s << '-';
+        else if (expr->expr_union.unary.op & 4)
+            s << "sqrt";
+        s << '(';
+        print(s, expr->expr_union.unary.arg);
+        s << ')';
+        if (expr->expr_union.unary.op & 2)
+            s << "^-1";
+    } else {
+        s << '(';
+        print(s, expr->expr_union.binary.arg1);
+        s << ") " << (expr->expr_union.binary.op & 1 ? '+' : '*') << " (";
+        print(s, expr->expr_union.binary.arg2);
+        s << ")";
+    }
+}
+
 constr_num sqrt(const constr_num &a)
 {
     constr_num::Expr *e = new constr_num::Expr();
     e->type = constr_num::Expr::unary;
     e->expr_union.unary.op = e->expr_union.unary.sqrt;
-    e->expr_union.unary.arg = a.expr;
+    e->expr_union.unary.arg = a.copy(a.expr);
     return constr_num(e);
 }
 

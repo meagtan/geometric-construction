@@ -1,9 +1,9 @@
 #ifndef CONSTR_NUM_H
 #define CONSTR_NUM_H
 
-#include <string>
+#include <iostream>
 
-using std::string;
+using std::ostream;
 
 // Constructible numbers
 class constr_num {
@@ -44,9 +44,10 @@ class constr_num {
 
     Expr *copy(Expr *expr) const;
 
+    void print(ostream &s, Expr *expr) const;
+
 public:
     constr_num(int value = 0);
-    constr_num(string str);
     constr_num(const constr_num &other);
     ~constr_num();
 
@@ -69,6 +70,8 @@ public:
     bool operator>(const constr_num &a) const;
     bool operator<=(const constr_num &a) const;
     bool operator>=(const constr_num &a) const;
+
+    friend ostream &operator<<(ostream &s, const constr_num &a);
 
     friend constr_num sqrt(const constr_num &a);
     friend constr_num abs(const constr_num &a);
