@@ -79,30 +79,20 @@ protected:
     virtual bool within_boundary(const Point &a) const;
 };
 
-struct _Move {};
-
-enum struct MoveType { compass = 'c', straightedge = 's', meet = 'm' };
-
-template<typename T1, typename T2, typename R>
-struct Move : _Move {
-    const MoveType move;
-    const T1 *arg1;
-    const T2 *arg2;
-    const R *result;
-
-    Move(const MoveType move, const T1 *arg1, const T2 *arg2, const R *result);
-    Move(const Move &other) = default;
-    ~Move() = default;
+struct MoveListener {
+    virtual void straightedge(const Point*, const Point*, const Line*) = 0;
+    virtual void compass(const Point*, const Point*, const Circle*) = 0;
+    virtual void meet(const Circle*, const Circle*, const Point*) = 0;
+    virtual void meet(const Line*, const Circle*, const Point*) = 0;
+    virtual void meet(const Line*, const Line*, const Point*) = 0;
 };
-
-typedef void (*MoveListener)(_Move move);
 
 class Scope {
 protected:
     vector<const Point*>  points;
     vector<const Line*>   lines;
     vector<const Circle*> circles;
-    MoveListener listener;
+    MoveListener *listener;
 
     // TODO store names for each point, line and circle
 
@@ -111,7 +101,7 @@ protected:
     void add(const Circle *c);
 
 public:
-    Scope(MoveListener listener);
+    Scope(MoveListener *listener);
     ~Scope();
 
     bool contains(const Point *a) const;

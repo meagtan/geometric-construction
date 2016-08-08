@@ -46,7 +46,7 @@ protected:
     vector<const Angle*> angles;
 
 public:
-    Constructor(MoveListener listener);
+    Constructor(MoveListener *listener);
     ~Constructor();
 
     bool contains(const Angle *a) const;

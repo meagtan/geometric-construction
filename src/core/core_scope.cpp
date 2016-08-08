@@ -1,14 +1,8 @@
 #include "include/core.h"
 
-// Moves
-
-template<typename T1, typename T2, typename R>
-Move<T1,T2,R>::Move(const MoveType move, const T1 *arg1, const T2 *arg2, const R *result) :
-    move(move), arg1(arg1), arg2(arg2), result(result) {}
-
 // Scope
 
-Scope::Scope(MoveListener listener) : listener(listener)
+Scope::Scope(MoveListener *listener) : listener(listener)
 {
     add(origin);
     add(unit_x);
@@ -67,10 +61,10 @@ bool Scope::contains(const Circle *c) const
            std::count_if(circles.begin(), circles.end(), [c](const Circle *p) {return *p == *c; });
 }
 
-#define _make_move(movetype, arg1, arg1type, arg2, arg2type, res, restype) do {               \
+#define _make_move(movetype, arg1, arg2, res) do {               \
     if (res != nullptr) {                                                                     \
         add(res);                                                                       \
-        listener(Move<arg1type,arg2type,restype>(MoveType::movetype, arg1, arg2, res)); \
+        listener->movetype(arg1, arg2, res); \
 }} while (0)
 
 // draw line connecting two points
@@ -80,7 +74,7 @@ const Line *Scope::join_line(const Point &a, const Point &b)
         return nullptr;
 
     const Line *l = new Line(a, b);
-    _make_move(straightedge, &a, Point, &b, Point, l, Line);
+    _make_move(straightedge, &a, &b, l);
 
     return l;
 }
@@ -92,7 +86,7 @@ const Circle *Scope::join_circle(const Point &a, const Point &b)
         return nullptr;
 
     const Circle *c = new Circle(a, b);
-    _make_move(compass, &a, Point, &b, Point, c, Circle);
+    _make_move(compass, &a, &b, c);
 
     return c;
 }
@@ -104,7 +98,7 @@ const Point *Scope::meet(const Line &a, const Line &b)
         return nullptr;
 
     const Point *p = a.meet(b);
-    _make_move(meet, &a, Line, &b, Line, p, Point);
+    _make_move(meet, &a, &b, p);
 
     return p;
 }
@@ -117,8 +111,8 @@ pair<const Point*,const Point*> Scope::meet(const Line &a, const Circle &b)
 
     auto res = b.meet(a);
 
-    _make_move(meet, &a, Line, &b, Circle, res.first, Point);
-    _make_move(meet, &a, Line, &b, Circle, res.second, Point);
+    _make_move(meet, &a, &b, res.first);
+    _make_move(meet, &a, &b, res.second);
 
     return res;
 }
@@ -131,8 +125,8 @@ pair<const Point*,const Point*> Scope::meet(const Circle &a, const Circle &b)
 
     auto res = a.meet(b);
 
-    _make_move(meet, &a, Circle, &b, Circle, res.first, Point);
-    _make_move(meet, &a, Circle, &b, Circle, res.second, Point);
+    _make_move(meet, &a, &b, res.first);
+    _make_move(meet, &a, &b, res.second);
 
     return res;
 }

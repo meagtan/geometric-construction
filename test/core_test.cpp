@@ -44,8 +44,31 @@ void circle_test()
 
 void scope_test()
 {
+    struct MyListener : MoveListener {
+        void straightedge(const Point*, const Point*, const Line*)
+        {
+            cout << "straightedge\n";
+        }
+        void compass(const Point*, const Point*, const Circle*)
+        {
+            cout << "compass\n";
+        }
+        void meet(const Circle*, const Circle*, const Point*)
+        {
+            cout << "meet circles\n";
+        }
+        void meet(const Line*, const Circle*, const Point*)
+        {
+            cout << "meet line and circle\n";
+        }
+        void meet(const Line*, const Line*, const Point*)
+        {
+            cout << "meet lines\n";
+        }
+    } lis;
+
     Point a(3, 4);
-    Scope s([](_Move m){cout << "added\n";});
+    Scope s(&lis);
 
     auto *l = s.join_line(a, *origin);
     if (l == nullptr) return;

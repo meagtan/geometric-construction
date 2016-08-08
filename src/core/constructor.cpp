@@ -1,7 +1,7 @@
 #include "include/geom.h"
 #include <assert.h>
 
-Constructor::Constructor(MoveListener listener) :
+Constructor::Constructor(MoveListener *listener) :
     Scope(listener), angles() {}
 
 Constructor::~Constructor()
@@ -22,10 +22,10 @@ void Constructor::add(const Angle *a)
         angles.push_back(a);
 }
 
-#define _make_move(movetype, arg1, arg1type, arg2, arg2type, res, restype) do {               \
+#define _make_move(movetype, arg1, arg2, res) do {               \
     if (res != nullptr) {                                                                     \
         Scope::add(res);                                                                       \
-        Scope::listener(Move<arg1type,arg2type,restype>(MoveType::movetype, arg1, arg2, res)); \
+        Scope::listener->movetype(arg1, arg2, res); \
     }} while (0)
 
 const LineSegment *Constructor::join_segment(const Point &a, const Point &b)
@@ -35,7 +35,7 @@ const LineSegment *Constructor::join_segment(const Point &a, const Point &b)
 
     const LineSegment *res = new LineSegment(a, b);
     Scope::add(res);
-    _make_move(straightedge, &a, Point, &b, Point, res, Line);
+    _make_move(straightedge, &a, &b, res);
     return res;
 }
 
@@ -48,11 +48,11 @@ const Angle *Constructor::join_angle(const Point &end1, const Point &vertex, con
     add(res);
     if (!Scope::contains(&res->l1)) {
         Scope::add(&res->l1);
-        _make_move(straightedge, &vertex, Point, &end1, Point, &res->l1, Line);
+        _make_move(straightedge, &vertex, &end1, &res->l1);
     }
     if (!Scope::contains(&res->l2)) {
         Scope::add(&res->l2);
-        _make_move(straightedge, &vertex, Point, &end2, Point, &res->l2, Line);
+        _make_move(straightedge, &vertex, &end2, &res->l2);
     }
     return res;
 }
