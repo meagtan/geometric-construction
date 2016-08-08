@@ -16,7 +16,8 @@ SOURCES += \
     src/core/geom.cpp \
     src/core/constructor.cpp \
     src/core/constr_num.cpp \
-    test/constr_num_test.cpp
+    test/constr_num_test.cpp \
+    test/core_test.cpp
 
 HEADERS += \
     include/core.h \

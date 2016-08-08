@@ -56,7 +56,7 @@ constr_num::Expr::~Expr()
 
 bool constr_num::is_int() const
 {
-    return expr != nullptr && expr->type == Expr::constant;
+    return expr != nullptr && !std::fmod(value(), 1);
 }
 
 double constr_num::value() const
