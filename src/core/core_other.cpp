@@ -6,7 +6,8 @@ Point::Point(constr_num x, constr_num y) : x(x), y(y) {}
 
 constr_num Point::distance(const Point &other) const
 {
-    return sqrt(x * other.x + y * other.y);
+    return sqrt((x - other.x) * (x - other.x) +
+                (y - other.y) * (y - other.y));
 }
 
 bool Point::operator==(const Point &other) const
@@ -25,9 +26,9 @@ Line::Line(constr_num x_coeff, constr_num y_coeff, constr_num const_coeff) :
     x_coeff(x_coeff), y_coeff(y_coeff), const_coeff(const_coeff) {}
 
 Line::Line(const Point &a, const Point &b) :
-    x_coeff(a.y - b.y),
-    y_coeff(b.x - a.x),
-    const_coeff(a.x * b.y - a.y * b.x) {}
+    x_coeff(b.y - a.y),
+    y_coeff(a.x - b.x),
+    const_coeff(b.x * a.y - b.y * a.x) {}
 
 constr_num Line::norm() const
 {
@@ -75,8 +76,8 @@ const Point *Line::meet(const Line &other) const
         return nullptr;
 
     // might be neater with matrices
-    constr_num x = (const_coeff * other.y_coeff - y_coeff * other.const_coeff) / det,
-               y = (other.const_coeff * x_coeff - other.x_coeff * const_coeff) / det;
+    constr_num x = (y_coeff * other.const_coeff - const_coeff * other.y_coeff) / det,
+               y = (other.x_coeff * const_coeff - other.const_coeff * x_coeff) / det;
 
     Point* p = new Point(x, y);
 

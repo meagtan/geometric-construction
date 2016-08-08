@@ -8,7 +8,7 @@
 using std::vector;
 using std::pair;
 
-// consider all integers already constructed
+// consider all integers already constructed (keep this in mind while constructing numbers)
 constexpr bool auto_construct_ints = true;
 
 struct Point {
@@ -20,7 +20,6 @@ struct Point {
 
     constr_num distance(const Point &other) const;
 
-    // TODO overloaded operators for comparison, copy constructor etc.
     bool operator==(const Point &other) const;
     bool operator!=(const Point &other) const;
 };
