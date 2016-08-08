@@ -7,6 +7,6 @@ int main(int argc, char *argv[])
 
     return a.exec();
     */
-    void circle_test();
-    circle_test();
+    void scope_test();
+    scope_test();
 }
