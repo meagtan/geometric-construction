@@ -22,3 +22,21 @@ void line_test()
     if (meet != nullptr)
         cout << (*meet).x.value() << "," << (*meet).y.value() << '\n';
 }
+
+void circle_test()
+{
+    Point a, b(3), c(3, 4);
+    Circle c1(a, c);
+
+    cout << "(x - " << c1.center.x.value() << ")^2 + (y - " << c1.center.y.value() << ")^2 = " << c1.radius.value() << "^2\n";
+    cout << "(x,y) = (" << b.x.value() << "," << b.y.value() << ") => " << c1.value_at(b).value() << '\n';
+    cout << c1.distance(b).value() << " = 2\n";
+    cout << c1.contains(Point(-3, -4)) << " and " << c1.contains(c) << " but not " << c1.contains(b) << '\n';
+    auto pair = c1.meet(Line(a, b));
+    if (pair.first != nullptr && pair.second != nullptr)
+        cout << "{" << pair.first->x.value() << "," << pair.second->x.value() << "} = {-5,5}\n";
+    pair = c1.meet(Circle(b, a));
+    if (pair.first != nullptr && pair.second != nullptr)
+        cout << pair.first->x.value() << " = " << pair.second->x.value() << " but " <<
+                pair.first->y.value() << " + " << pair.second->y.value() << " = 0\n";
+}
