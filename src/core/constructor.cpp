@@ -188,9 +188,9 @@ const Line *Constructor::bisect(const Angle &a)
     auto _meet = meet(a.l2, *c);
     assert(_meet.first != nullptr);
     assert(_meet.second != nullptr);
-
     const Point *p2 = a.l1.precedes(a.vertex, *p1) == a.l1.precedes(a.vertex, *_meet.first) ? _meet.first : _meet.second;
-    return join_line(*p1, *p2);
+
+    return bisect(*p1, *p2);
 }
 
 const Point *Constructor::midpoint(const Point &a, const Point &b)
@@ -286,7 +286,11 @@ const Line *Constructor::rotate(const Line &l, const Angle &a, const Point &pivo
     l1 = parallel(*l1, pivot);
     assert(l1 != nullptr);
 
-    // reflect line around parallel
+    // reflect bisector around line
+    l1 = reflect(*l1, l);
+    assert(l1 != nullptr);
+
+    // then reflect line around new bisector
     return reflect(l, *l1);
 }
 
@@ -300,7 +304,11 @@ const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
     l1 = parallel(*l1, l.start);
     if (l1 == nullptr) return nullptr;
 
-    // reflect end around parallel
+    // reflect bisector around segment
+    l1 = reflect(*l1, l);
+    if (l1 == nullptr) return nullptr;
+
+    // reflect end around new bisector
     const Point *end = reflect(l.end, *l1);
     if (end == nullptr) return nullptr;
 
