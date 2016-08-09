@@ -1,7 +1,7 @@
 #ifndef GEOM_H
 #define GEOM_H
 
-#include "core.h"
+#include "include/core.h"
 
 // More geometry and operations by compass and straightedge construction
 

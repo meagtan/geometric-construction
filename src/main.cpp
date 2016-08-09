@@ -1,5 +1,10 @@
 #include <QCoreApplication>
 
+#define TEST(obj) do { \
+    void obj##_test(); \
+    obj##_test();      \
+} while (0)
+
 int main(int argc, char *argv[])
 {
     /*
@@ -7,6 +12,5 @@ int main(int argc, char *argv[])
 
     return a.exec();
     */
-    void scope_test();
-    scope_test();
+    TEST(angle);
 }

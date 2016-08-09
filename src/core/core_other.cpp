@@ -52,7 +52,7 @@ bool Line::contains(const Point &a) const
 
 bool Line::precedes(const Point &a, const Point &b) const
 {
-    return contains(a) && contains(b) &&
+    return // contains(a) && contains(b) &&
            x_coeff * (b.x - a.x) > 0;
 }
 
