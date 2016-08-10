@@ -41,8 +41,8 @@ bool LineSegment::operator==(const LineSegment &other) const
 
 bool LineSegment::within_boundary(const Point &a) const
 {
-    return precedes(start, a) &&
-           precedes(a, end);
+    return (precedes(start, a) && precedes(a, end)) ||
+           a == start || a == end;
 }
 
 // Angle

@@ -24,3 +24,41 @@ void angle_test()
     cout << a1.sine().value() << "," << a2.sine().value() << "," << a3.sine().value() << "\n" <<
             a1.cosine().value() << "," << a2.cosine().value() << "," << a3.cosine().value() << '\n';
 }
+
+void constructor_test()
+{
+    struct MyListener : MoveListener {
+        void straightedge(const Point*, const Point*, const Line*)
+        {
+            cout << "straightedge\n";
+        }
+        void compass(const Point*, const Point*, const Circle*)
+        {
+            cout << "compass\n";
+        }
+        void meet(const Circle*, const Circle*, const Point*)
+        {
+            cout << "meet circles\n";
+        }
+        void meet(const Line*, const Circle*, const Point*)
+        {
+            cout << "meet line and circle\n";
+        }
+        void meet(const Line*, const Line*, const Point*)
+        {
+            cout << "meet lines\n";
+        }
+    } lis;
+
+    Constructor s(&lis);
+    Point *a = new Point(),
+          *b = new Point(3),
+          *c = new Point(3, 4);
+    s.addPoint(b);
+    s.addPoint(c);
+    auto *l = s.join_segment(*a, *c);
+    cout << l->contains(*c) << " and " << s.contains(c) << '\n';
+    auto *l1 = s.perpendicular(*l, *b);
+    cout << l1->x_coeff.value() << " x + " << l1->y_coeff.value() << " y + " << l1->const_coeff.value() << " = 0\n";
+    cout << l1->contains(*b) << " and not " << (l->x_coeff * l1->x_coeff + l->y_coeff * l1->y_coeff).value() << '\n';
+}

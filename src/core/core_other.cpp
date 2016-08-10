@@ -137,8 +137,8 @@ pair<const Point*,const Point*> Circle::meet(const Line &other) const
 {
     constr_num value = other.value_at(center),
                discr = radius * radius * other.norm() - value * value,
-               x_offset = center.x + other.x_coeff * value / other.norm(),
-               y_offset = center.y + other.y_coeff * value / other.norm();
+               x_offset = center.x - other.x_coeff * value / other.norm(),
+               y_offset = center.y - other.y_coeff * value / other.norm();
     Point *p1 = nullptr, *p2 = nullptr;
 
     if (discr == 0) {

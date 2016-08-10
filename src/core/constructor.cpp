@@ -79,8 +79,9 @@ const Line *Constructor::perpendicular(const Line &l, const Point &p)
     assert(c != nullptr);
 
     auto pair = meet(l1, *c); // the copy constructor works well with Scope::contains
-    o2 = pair.first == o1 ? pair.second : pair.first;
+    o2 = *pair.first == *o1 ? pair.second : pair.first;
     assert(o2 != nullptr);
+    assert(*o1 != *o2);
 
     // create circles from o1 to o2 and from o2 to o1
 
@@ -96,7 +97,6 @@ const Line *Constructor::perpendicular(const Line &l, const Point &p)
     assert(*pair.first != *pair.second); // c1 and c2 are different
 
     return join_line(*pair.first, *pair.second);
-
     // the deletion of all these items are to be handled by ~Scope()
 }
 

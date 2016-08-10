@@ -94,8 +94,6 @@ protected:
     vector<const Circle*> circles;
     MoveListener *listener;
 
-    // TODO store names for each point, line and circle
-
     void add(const Point *a);
     void add(const Line *l);
     void add(const Circle *c);
@@ -103,6 +101,8 @@ protected:
 public:
     Scope(MoveListener *listener);
     ~Scope();
+
+    void addPoint(const Point *a); // for points with integer coordinates only
 
     bool contains(const Point *a) const;
     bool contains(const Line *l) const;

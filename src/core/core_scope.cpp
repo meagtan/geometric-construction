@@ -42,11 +42,16 @@ void Scope::add(const Circle *c)
         circles.push_back(c);
 }
 
+void Scope::addPoint(const Point *a)
+{
+    if (auto_construct_ints && a->x.is_int() && a->y.is_int())
+        add(a);
+}
+
 bool Scope::contains(const Point *a) const
 {
     return a != nullptr &&
-           ((auto_construct_ints && a->x.is_int() && a->y.is_int()) ||
-            std::count_if(points.begin(), points.end(), [a](const Point *p) {return *p == *a; }));
+           std::count_if(points.begin(), points.end(), [a](const Point *p) {return *p == *a; });
 }
 
 bool Scope::contains(const Line *l) const
