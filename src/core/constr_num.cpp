@@ -8,7 +8,7 @@ constr_num::constr_num(int value)
     expr->expr_union.constant = value;
 }
 
-constr_num::constr_num(Expr *expr) : expr(expr) {} // TODO copy semantics
+constr_num::constr_num(Expr *expr) : expr(expr) {}
 
 constr_num::constr_num(const constr_num &other)
 {
@@ -193,27 +193,27 @@ ostream &operator<<(ostream &s, const constr_num &a)
     return s;
 }
 
-// quick hack
+// quick hack, prints number as lisp expression
 void constr_num::print(ostream &s, Expr *expr) const
 {
     if (expr->type == Expr::constant) {
         s << expr->expr_union.constant;
     } else if (expr->type == Expr::unary) {
-        if (expr->expr_union.unary.op & 1)
-            s << '-';
-        else if (expr->expr_union.unary.op & 4)
-            s << "sqrt";
         s << '(';
+        if (expr->expr_union.unary.op & 1)
+            s << "- ";
+        else if (expr->expr_union.unary.op & 4)
+            s << "1/ ";
+        else
+            s << "sqrt ";
         print(s, expr->expr_union.unary.arg);
         s << ')';
-        if (expr->expr_union.unary.op & 2)
-            s << "^-1";
     } else {
-        s << '(';
+        s << "( " << (expr->expr_union.binary.op & 1 ? '+' : '*') << " ";
         print(s, expr->expr_union.binary.arg1);
-        s << ") " << (expr->expr_union.binary.op & 1 ? '+' : '*') << " (";
+        s << ' ';
         print(s, expr->expr_union.binary.arg2);
-        s << ")";
+        s << ')';
     }
 }
 

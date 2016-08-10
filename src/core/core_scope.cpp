@@ -75,7 +75,7 @@ bool Scope::contains(const Circle *c) const
 // draw line connecting two points
 const Line *Scope::join_line(const Point &a, const Point &b)
 {
-    if (!contains(&a) || !contains(&b))
+    if (!contains(&a) || !contains(&b) || a == b)
         return nullptr;
 
     const Line *l = new Line(a, b);
@@ -87,7 +87,7 @@ const Line *Scope::join_line(const Point &a, const Point &b)
 // draw circle centered in a and touching b
 const Circle *Scope::join_circle(const Point &a, const Point &b)
 {
-    if (!contains(&a) || !contains(&b))
+    if (!contains(&a) || !contains(&b) || a == b)
         return nullptr;
 
     const Circle *c = new Circle(a, b);
@@ -99,7 +99,7 @@ const Circle *Scope::join_circle(const Point &a, const Point &b)
 // intersect two lines
 const Point *Scope::meet(const Line &a, const Line &b)
 {
-    if (!contains(&a) || !contains(&b))
+    if (!contains(&a) || !contains(&b) || a == b)
         return nullptr;
 
     const Point *p = a.meet(b);
@@ -125,7 +125,7 @@ pair<const Point*,const Point*> Scope::meet(const Line &a, const Circle &b)
 // intersect two circles
 pair<const Point*,const Point*> Scope::meet(const Circle &a, const Circle &b)
 {
-    if (!contains(&a) || !contains(&b))
+    if (!contains(&a) || !contains(&b) || a == b)
         return pair<Point*,Point*>(nullptr, nullptr);
 
     auto res = a.meet(b);
