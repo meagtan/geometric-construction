@@ -65,7 +65,6 @@ const Line *Constructor::perpendicular(const Line &l, const Point &p)
 {
     const Point *o1, *o2;
     const Circle *c, *c1, *c2;
-    const Line &l1 (l); // ensure containment for line segments
 
     if (!Scope::contains(&p) || !Scope::contains(&l))
         return nullptr;
@@ -239,37 +238,49 @@ const Point *Constructor::reflect(const Point &a, const Point &pivot)
     return *_meet.first == a ? _meet.second : _meet.first;
 }
 
-
+// only returns nullptr if a or pivot isn't contained, makes no moves in that case
 const Point *Constructor::reflect(const Point &a, const Line &pivot)
 {
     const Line &p (pivot), // override within_boundary
                *l = perpendicular(p, a);
 
-    if (l == nullptr)
+    if (l == nullptr) // when p or a isn't contained
         return nullptr;
-    const Point *c = meet(p, *l);
 
-    if (c == nullptr)
-        return nullptr;
+    const Point *c = meet(p, *l);
+    assert(c == nullptr); // p and l are both contained and perpendicular to one another
+
     return reflect(a, *c);
 }
 
+// returns a if pivot on a, nullptr if either of them isn't contained, makes no moves in those cases
 const Line *Constructor::reflect(const Line &a, const Point &pivot)
 {
-    const Line &l (a),
-               *p = perpendicular(l, pivot);
+    const Line &l (a);
 
-    if (p == nullptr)
+    // how would this behave with line segments?
+    if (l.contains(pivot)) {
+        add(l);
+        return l;
+    }
+
+    const Line *p = perpendicular(l, pivot);
+
+    if (p == nullptr) // when a or pivot isn't contained
         return nullptr;
+
     const Point *b = reflect(*meet(l, *p), pivot);
+    assert(b != nullptr); // pivot isn't on a
 
-    if (b == nullptr)
-        return nullptr;
     return perpendicular(*p, *b);
 }
 
+// returns nullptr if arguments aren't contained, makes no moves
 const Line *Constructor::reflect(const Line &a, const Line &pivot)
 {
+    if (!Scope::contains(&a) || !Scope::contains(&pivot))
+        return nullptr;
+
     // different cases for a and pivot being parallel or not
     const Point *vertex = meet(a, pivot), *p1 = nullptr;
 
@@ -291,14 +302,19 @@ const Line *Constructor::reflect(const Line &a, const Line &pivot)
 
     // reflect p1 around pivot
     const Point *p = reflect(*p1, pivot);
+    assert (p != nullptr); // p1 and pivot are contained
 
-    if (p == nullptr)
-        return nullptr;
     return join_line(*vertex, *p);
 }
 
+// The following algorithms don't work:
+
+// pivot is assumed to be in the internal region of the angle of rotation
 const Line *Constructor::rotate(const Line &l, const Angle &a, const Point &pivot)
 {
+    if (!contains(&a) || !Scope::contains(&l) || !Scope::contains(&pivot))
+        return nullptr;
+
     // find bisector of angle
     const Line *l1 = bisect(a);
     assert(l1 != nullptr);
@@ -307,16 +323,15 @@ const Line *Constructor::rotate(const Line &l, const Angle &a, const Point &pivo
     l1 = parallel(*l1, pivot);
     assert(l1 != nullptr);
 
-    // reflect bisector around line
-    l1 = reflect(*l1, l);
-    assert(l1 != nullptr);
-
-    // then reflect line around new bisector
+    // then reflect line around bisector
     return reflect(l, *l1);
 }
 
 const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
 {
+    if (!Scope::contains(&l) || !contains(&a))
+        return nullptr;
+
     // find bisector of angle
     const Line *l1 = bisect(a);
     if (l1 == nullptr) return nullptr;
