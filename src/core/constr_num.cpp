@@ -3,9 +3,7 @@
 
 constr_num::constr_num(int value)
 {
-    expr = new Expr();
-    expr->type = Expr::constant;
-    expr->expr_union.constant = value;
+    expr = constant(value);
 }
 
 constr_num::constr_num(Expr *expr) : expr(expr) {}
@@ -109,54 +107,6 @@ constr_num &constr_num::operator=(const constr_num &a)
     return *this;
 }
 
-constr_num constr_num::operator-() const
-{
-    Expr *e = new Expr();
-    e->type = Expr::unary;
-    e->expr_union.unary.op = e->expr_union.unary.neg;
-    e->expr_union.unary.arg = copy(expr);
-    return constr_num(e);
-}
-
-constr_num constr_num::operator+(const constr_num &a) const
-{
-    Expr *e = new Expr();
-    e->type = Expr::binary;
-    e->expr_union.binary.op = e->expr_union.binary.add;
-    e->expr_union.binary.arg1 = copy(expr);
-    e->expr_union.binary.arg2 = copy(a.expr);
-    return constr_num(e);
-}
-
-constr_num constr_num::operator-(const constr_num &a) const
-{
-    return operator+(-a);
-}
-
-constr_num constr_num::operator*(const constr_num &a) const
-{
-    Expr *e = new Expr();
-    e->type = Expr::binary;
-    e->expr_union.binary.op = e->expr_union.binary.mul;
-    e->expr_union.binary.arg1 = copy(expr);
-    e->expr_union.binary.arg2 = copy(a.expr);
-    return constr_num(e);
-}
-
-constr_num constr_num::operator/(const constr_num &a) const
-{
-    return operator*(a.inv());
-}
-
-constr_num constr_num::inv() const
-{
-    Expr *e = new Expr();
-    e->type = Expr::unary;
-    e->expr_union.unary.op = e->expr_union.unary.inv;
-    e->expr_union.unary.arg = copy(expr);
-    return constr_num(e);
-}
-
 bool constr_num::operator==(const constr_num &a) const
 {
     return value() == a.value();
@@ -215,15 +165,6 @@ void constr_num::print(ostream &s, Expr *expr) const
         print(s, expr->expr_union.binary.arg2);
         s << ')';
     }
-}
-
-constr_num sqrt(const constr_num &a)
-{
-    constr_num::Expr *e = new constr_num::Expr();
-    e->type = constr_num::Expr::unary;
-    e->expr_union.unary.op = e->expr_union.unary.sqrt;
-    e->expr_union.unary.arg = a.copy(a.expr);
-    return constr_num(e);
 }
 
 constr_num abs(const constr_num &a)

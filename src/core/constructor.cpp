@@ -68,6 +68,7 @@ const Line *Constructor::perpendicular(const Line &l, const Point &p)
 
     if (!Scope::contains(&p) || !Scope::contains(&l))
         return nullptr;
+    const Line &l1 (l);
 
     // generate two points on the line equidistant from p
 
@@ -100,10 +101,12 @@ const Line *Constructor::perpendicular(const Line &l, const Point &p)
 // only returns nullptr if l or p not contained, makes no moves in that case
 const Line *Constructor::parallel(const Line &l, const Point &p)
 {
-    if (l.contains(p))
-        return &l;
+    const Line &l1 (l);
 
-    auto perp = perpendicular(l, p);
+    if (l1.contains(p))
+        return &l1;
+
+    auto perp = perpendicular(l1, p);
     if (perp == nullptr)
         return nullptr;
 
@@ -115,7 +118,6 @@ const LineSegment *Constructor::translate(const LineSegment &l, const Point &sta
 {
     const Line *par, *diff, *diff1;
     const Point *end;
-    const LineSegment *res;
 
     par = parallel(l, start);
     if (par == nullptr) // l or start isn't added
@@ -186,7 +188,7 @@ const Line *Constructor::bisect(const Angle &a)
         return nullptr;
 
     // 0 degree angle
-    if (a.l1 == a.l2 && a.region1 * a.l1.x_coeff == a.region2 * a.l2.x_coeff)
+    if (a.l1 == a.l2 && a.l1.x_coeff * a.region1 == a.l2.x_coeff * a.region2)
         return &a.l1;
 
     // find point on l1 other than vertex
@@ -260,8 +262,8 @@ const Line *Constructor::reflect(const Line &a, const Point &pivot)
 
     // how would this behave with line segments?
     if (l.contains(pivot)) {
-        add(l);
-        return l;
+        add(&l);
+        return &l;
     }
 
     const Line *p = perpendicular(l, pivot);

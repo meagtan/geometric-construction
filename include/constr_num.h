@@ -40,6 +40,14 @@ class constr_num {
     double apply_unary(int op, double arg) const;
     double apply_binary(int op, double arg1, double arg2) const;
 
+    // handle node creation, copying, canonical form internally
+    Expr *constant(int value) const;
+    Expr *negate(Expr *e) const;
+    Expr *invert(Expr *e) const;
+    Expr *_sqrt(Expr *e) const;
+    Expr *add(Expr *e1, Expr *e2) const;
+    Expr *mul(Expr *e1, Expr *e2) const;
+
     constr_num inv() const;
 
     Expr *copy(Expr *expr) const;
