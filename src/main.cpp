@@ -12,5 +12,5 @@ int main(int argc, char *argv[])
 
     return a.exec();
     */
-    TEST(constructor);
+    TEST(constr_num);
 }

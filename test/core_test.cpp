@@ -13,8 +13,8 @@ void line_test()
     Point a, b(3), c(3, 4);
     Line l(a, c), l2(b, c);
 
-    cout << l.x_coeff.value() << " x + " << l.y_coeff.value() << " y + " << l.const_coeff.value() << " = 0\n";
-    cout << l.value_at(b).value() << " / " << l.norm().value() << " = " << l.distance(b).value() << '\n';
+    cout << l.x_coeff << " x + " << l.y_coeff << " y + " << l.const_coeff << " = 0\n";
+    cout << l.value_at(b).value() << " / " << sqrt(l.norm()).value() << " = " << l.distance(b).value() << '\n';
     cout << l.contains(a) << " and " << l.contains(c) << " but not " << l.contains(b) << '\n';
     cout << l.precedes(a, c) << '\n';
 

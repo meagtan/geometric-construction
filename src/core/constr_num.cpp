@@ -83,7 +83,7 @@ double constr_num::apply_unary(int op, double arg) const
     if (op & 1) // neg
         return -arg;
     if (op & 2) // inv
-        return arg == 0 ? NAN : 1 / arg;
+        return arg == 0 ? NAN : (1 / arg);
     return arg < 0 ? NAN : sqrt(arg);
 }
 
@@ -143,27 +143,59 @@ ostream &operator<<(ostream &s, const constr_num &a)
     return s;
 }
 
-// quick hack, prints number as lisp expression
-void constr_num::print(ostream &s, Expr *expr) const
+void constr_num::print(ostream &s, Expr *expr, bool parenthesize) const
 {
     if (expr->type == Expr::constant) {
         s << expr->expr_union.constant;
     } else if (expr->type == Expr::unary) {
-        s << '(';
         if (expr->expr_union.unary.op & 1)
-            s << "- ";
-        else if (expr->expr_union.unary.op & 4)
-            s << "1/ ";
+            s << "-";
+        else if (expr->expr_union.unary.op & 2)
+            s << "1 / ";
         else
-            s << "sqrt ";
-        print(s, expr->expr_union.unary.arg);
-        s << ')';
+            s << "√";
+
+        print(s, expr->expr_union.unary.arg, 1);
     } else {
-        s << "( " << (expr->expr_union.binary.op & 1 ? '+' : '*') << " ";
-        print(s, expr->expr_union.binary.arg1);
-        s << ' ';
-        print(s, expr->expr_union.binary.arg2);
-        s << ')';
+        if (parenthesize) s << '(';
+
+        // parenthesize addition within multiplication
+        print(s, expr->expr_union.binary.arg1,
+              expr->expr_union.binary.arg1->expr_union.binary.op <
+              expr->expr_union.binary.op);
+
+        // choose binary operator based on second argument
+        if (expr->expr_union.binary.op & 1) { // addition
+            // if the second argument is a negative constant or a negation, make it a subtraction instead of a sum
+            if (expr->expr_union.binary.arg2->type == Expr::constant &&
+                expr->expr_union.binary.arg2->expr_union.constant < 0) {
+                s << " - " << -expr->expr_union.binary.arg2->expr_union.constant;
+            } else if (expr->expr_union.binary.arg2->type == Expr::unary &&
+                expr->expr_union.binary.arg2->expr_union.unary.op & 1) {
+                s << " - ";
+                // print negend of second argument, parenthesizing it if it is an addition
+                print(s, expr->expr_union.binary.arg2->expr_union.unary.arg,
+                      expr->expr_union.binary.arg2->expr_union.unary.arg->expr_union.binary.op & 1);
+            } else {
+                s << " + ";
+                print(s, expr->expr_union.binary.arg2);
+            }
+        } else { // multiplication
+            // if the second argument is an inversion
+            if (expr->expr_union.binary.arg2->type == Expr::unary &&
+                expr->expr_union.binary.arg2->expr_union.unary.op & 2) {
+                s << " / ";
+                // print argument of inversion, parenthesizing it if it is a binary expression
+                print(s, expr->expr_union.binary.arg2->expr_union.unary.arg, 1);
+            } else {
+                s << " * ";
+                // parenthesize addition within multiplication
+                print(s, expr->expr_union.binary.arg2,
+                      expr->expr_union.binary.arg2->expr_union.unary.op & 1);
+            }
+        }
+
+        if (parenthesize) s << ')';
     }
 }
 

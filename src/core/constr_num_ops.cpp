@@ -47,12 +47,6 @@ constr_num::Expr *constr_num::invert(Expr *arg) const
     if (IS_INVERSION(arg))
         return copy(arg->expr_union.unary.arg);
 
-    // if arg is a constant, invert its value (if possible)
-    if (IS_CONSTANT(arg))
-        return constant(arg->expr_union.constant ?
-                        1/arg->expr_union.constant :
-                        NAN);
-
     // if arg is a product, distribute inversion across operands
     if (IS_PRODUCT(arg))
         return mul(invert(arg->expr_union.binary.arg1),
@@ -61,7 +55,7 @@ constr_num::Expr *constr_num::invert(Expr *arg) const
     // else create new inversion node
     Expr *e = new Expr();
     e->type = Expr::unary;
-    e->expr_union.unary.op = e->expr_union.unary.neg;
+    e->expr_union.unary.op = e->expr_union.unary.inv;
     e->expr_union.unary.arg = copy(arg);
     return e;
 }
@@ -70,12 +64,15 @@ constr_num::Expr *constr_num::_sqrt(Expr *arg) const
 {
     // if arg is an inversion, invert the square root of its argument
     if (IS_INVERSION(arg))
-        return invert(_sqrt(arg->expr_union.unary.arg));
+        return mul(_sqrt(arg->expr_union.unary.arg),
+                   invert(arg->expr_union.unary.arg));
 
+    /*
     // if arg is a multiplication, distribute sqrt across its operands
     if (IS_PRODUCT(arg))
         return mul(_sqrt(arg->expr_union.binary.arg1),
                    _sqrt(arg->expr_union.binary.arg2));
+    */
 
     // else create new sqrt node
     Expr *e = new Expr();
