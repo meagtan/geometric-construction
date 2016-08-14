@@ -88,6 +88,12 @@ constr_num::Expr *constr_num::add(Expr *e1, Expr *e2) const
     if (IS_CONSTANT(e1) && IS_CONSTANT(e2))
         return constant(e1->expr_union.constant + e2->expr_union.constant);
 
+    // when an argument is 0
+    if (IS_CONSTANT(e1) && e1->expr_union.constant == 0)
+        return copy(e2);
+    if (IS_CONSTANT(e2) && e2->expr_union.constant == 0)
+        return copy(e1);
+
     // if e1 is a negation and e2 isn't, swap them
     if (IS_NEGATION(e1) && !IS_NEGATION(e2)) {
         Expr *temp = e1;
@@ -115,14 +121,35 @@ constr_num::Expr *constr_num::mul(Expr *e1, Expr *e2) const
     if (IS_CONSTANT(e1) && IS_CONSTANT(e2))
         return constant(e1->expr_union.constant * e2->expr_union.constant);
 
+    // when an argument is 0
+    if ((IS_CONSTANT(e1) && e1->expr_union.constant == 0) ||
+        (IS_CONSTANT(e2) && e2->expr_union.constant == 0))
+        return constant(0);
+
+    // when an argument is 1
+    if (IS_CONSTANT(e1) && e1->expr_union.constant == 1)
+        return copy(e2);
+    if (IS_CONSTANT(e2) && e2->expr_union.constant == 1)
+        return copy(e1);
+
+    // detect squares of square roots
+    if (IS_SQRT(e1) && IS_SQRT(e2) &&
+        value(e1->expr_union.unary.arg) == value(e2->expr_union.unary.arg))
+        return copy(e1->expr_union.unary.arg);
+
+    // propagate negations outward
+    if (IS_NEGATION(e1) || (IS_CONSTANT(e1) && value(e1) < 0))
+        return negate(mul(negate(e1), e2));
+    if (IS_NEGATION(e2) || (IS_CONSTANT(e2) && value(e2) < 0))
+        return negate(mul(e1, negate(e2)));
+
+
     // if e1 is an inversion and e2 isn't, swap them
     if (IS_INVERSION(e1) && !IS_INVERSION(e2)) {
         Expr *temp = e1;
         e1 = e2;
         e2 = temp;
     }
-
-    // if either argument is an addition, distribute arguments
 
     // if e2 is a multiplication, first multiply its first operand and then its second,
     //   to guarantee left associativity

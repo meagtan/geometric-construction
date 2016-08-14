@@ -12,5 +12,5 @@ int main(int argc, char *argv[])
 
     return a.exec();
     */
-    TEST(constr_num);
+    TEST(circle);
 }
