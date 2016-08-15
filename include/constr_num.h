@@ -7,6 +7,8 @@ using std::ostream;
 
 // Constructible numbers
 class constr_num {
+    friend class Calculator;
+
     struct Expr {
         enum {
             constant,

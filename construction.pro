@@ -19,9 +19,11 @@ SOURCES += \
     test/constr_num_test.cpp \
     test/core_test.cpp \
     test/geom_test.cpp \
-    src/core/constr_num_ops.cpp
+    src/core/constr_num_ops.cpp \
+    src/core/calculator.cpp
 
 HEADERS += \
     include/core.h \
     include/constr_num.h \
-    include/geom.h
+    include/geom.h \
+    include/calculator.h

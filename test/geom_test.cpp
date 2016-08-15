@@ -6,7 +6,7 @@ void segment_test()
 {
     Point a, b(3), c(3,4);
     LineSegment l(a, c);
-    cout << l.length().value() << " = 5\n";
+    cout << l.length() << " = 5\n";
     cout << l.contains(Point(-3,-4)) << " = 0\n";
 }
 
@@ -18,11 +18,11 @@ void angle_test()
     cout << a1.share_vertex(a2) << " but not " << a1.share_vertex(a3) << "\n";
     auto l = a1.shared_line(a2); // should be the line connecting a and b
     if (l != nullptr)
-        cout << l->x_coeff.value() << " x + " << l->y_coeff.value() << " y + " <<
-                l->const_coeff.value() << " = 0\n";
+        cout << l->x_coeff << " x + " << l->y_coeff << " y + " <<
+                l->const_coeff << " = 0\n";
 
-    cout << a1.sine().value() << "," << a2.sine().value() << "," << a3.sine().value() << "\n" <<
-            a1.cosine().value() << "," << a2.cosine().value() << "," << a3.cosine().value() << '\n';
+    cout << a1.sine() << "," << a2.sine() << "," << a3.sine() << "\n" <<
+            a1.cosine() << "," << a2.cosine() << "," << a3.cosine() << '\n';
 }
 
 void constructor_test()

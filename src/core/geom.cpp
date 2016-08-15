@@ -2,13 +2,13 @@
 
 // LineSegment
 
-#define _min(a,b,sort) sort(a,b) ? a : b
-#define _max(a,b,sort) sort(a,b) ? b : a
+// #define _min(a,b,sort) sort(a,b) ? a : b
+// #define _max(a,b,sort) sort(a,b) ? b : a
 
 LineSegment::LineSegment(const Point &start, const Point &end) :
-    Line(start, end),
-    start(_min(start, end, Line::precedes)),
-    end(_max(start, end, Line::precedes)) {}
+    Line(start, end), start(start), end(end) {}
+//    start(_min(start, end, Line::precedes)),
+//    end(_max(start, end, Line::precedes)) {}
 
 #undef _min
 #undef _max

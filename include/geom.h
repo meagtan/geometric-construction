@@ -1,7 +1,7 @@
 #ifndef GEOM_H
 #define GEOM_H
 
-#include "include/core.h"
+#include "core.h"
 
 // More geometry and operations by compass and straightedge construction
 
@@ -49,7 +49,7 @@ protected:
 
 public:
     Constructor(MoveListener *listener);
-    ~Constructor();
+    virtual ~Constructor();
 
     using Scope::contains;
     bool contains(const Angle *a) const;

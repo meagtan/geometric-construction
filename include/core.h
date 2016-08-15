@@ -100,7 +100,7 @@ protected:
 
 public:
     Scope(MoveListener *listener);
-    ~Scope();
+    virtual ~Scope();
 
     void addPoint(const Point *a); // for points with integer coordinates only
 
