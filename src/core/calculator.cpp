@@ -44,3 +44,18 @@ const Point *Calculator::sub(constr_num a, constr_num b)
 
     return &l->end;
 }
+
+const Point *Calculator::mul(constr_num a, constr_num b)
+{
+
+}
+
+const Point *Calculator::div(constr_num a, constr_num b)
+{
+
+}
+
+const Point *Calculator::construct_number(constr_num n)
+{
+
+}
