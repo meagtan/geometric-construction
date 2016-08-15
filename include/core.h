@@ -102,7 +102,7 @@ public:
     Scope(MoveListener *listener);
     virtual ~Scope();
 
-    void addPoint(const Point *a); // for points with integer coordinates only
+    bool addPoint(const Point *a); // for points with integer coordinates only
 
     bool contains(const Point *a) const;
     bool contains(const Line *l) const;
@@ -117,7 +117,8 @@ public:
 };
 
 const Point * const origin = new Point(),
-            * const unit_x = new Point(1);
+            * const unit_x = new Point(1),
+            * const unit_y = new Point(0, 1);
 const Line  * const x_axis = new Line(0, 1, 0),
             * const y_axis = new Line(1, 0, 0);
 

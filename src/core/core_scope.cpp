@@ -6,6 +6,7 @@ Scope::Scope(MoveListener *listener) : listener(listener)
 {
     add(origin);
     add(unit_x);
+    add(unit_y);
     add(x_axis);
     add(y_axis);
 }
@@ -42,10 +43,13 @@ void Scope::add(const Circle *c)
         circles.push_back(c);
 }
 
-void Scope::addPoint(const Point *a)
+bool Scope::addPoint(const Point *a)
 {
-    if (auto_construct_ints && a->x.is_int() && a->y.is_int())
+    if (auto_construct_ints && a->x.is_int() && a->y.is_int()) {
         add(a);
+        return true;
+    }
+    return false;
 }
 
 bool Scope::contains(const Point *a) const

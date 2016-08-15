@@ -9,6 +9,9 @@ public:
     Calculator(MoveListener *lis);
     virtual ~Calculator();
 
+    // creates and returns point (n,0) or (0,n)
+    const Point *get_point(constr_num n, bool on_y_axis = false);
+
     // constructs points and lines used in the arithmetic construction of numbers
     const Point *add(constr_num a, constr_num b);
     const Point *sub(constr_num a, constr_num b);
