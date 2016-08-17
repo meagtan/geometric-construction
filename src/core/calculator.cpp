@@ -105,5 +105,30 @@ const Point *Calculator::sqrt(constr_num a)
 
 const Point *Calculator::construct_number(constr_num n)
 {
+    const Point *p;
 
+    switch (n.expr->type) {
+    case 0:
+        p = new Point(n.expr->expr_union.constant);
+        addPoint(p);
+        return p;
+    case 1:
+        switch (n.expr->expr_union.unary.op) {
+        case 1:
+            return sub(0, n.expr->expr_union.unary.arg);
+        case 2:
+            return div(1, n.expr->expr_union.unary.arg);
+        default:
+            return sqrt(n.expr->expr_union.unary.arg);
+        }
+    default:
+        switch (n.expr->expr_union.binary.op) {
+        case 1:
+            return add(n.expr->expr_union.binary.arg1,
+                       n.expr->expr_union.binary.arg2);
+        default:
+            return add(n.expr->expr_union.binary.arg1,
+                       n.expr->expr_union.binary.arg2);
+        }
+    }
 }
