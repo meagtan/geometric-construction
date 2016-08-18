@@ -49,7 +49,7 @@ bool Scope::addPoint(const Point *a)
         add(a);
         return true;
     }
-    return false;
+    return contains(a);
 }
 
 bool Scope::contains(const Point *a) const
