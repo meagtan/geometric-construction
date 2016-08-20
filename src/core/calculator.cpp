@@ -1,28 +1,27 @@
 #include "include/calculator.h"
 #include <assert.h>
 
+#define GET_POINT(n, on_y_axis) (on_y_axis) ? GET_POINT(n) : GET_POINT(0, n)
+
 Calculator::Calculator(MoveListener *lis) : Constructor(lis) {}
 
 Calculator::~Calculator() {}
 
-const Point *Calculator::get_point(constr_num n, bool on_y_axis)
+const Point *Calculator::get_point(constr_num x, constr_num y)
 {
-    Point *p;
-    if (on_y_axis)
-        p = new Point(0, n);
-    else
-        p = new Point(n);
+    Point *p = new Point(x, y);
 
     if (addPoint(p))
         return p;
+    delete p;
     return nullptr;
 }
 
 const Point *Calculator::get_add(constr_num a, constr_num b, bool on_y_axis)
 {
-    const Point *pa = get_point(a, on_y_axis),
-                *pb = get_point(b, on_y_axis),
-                *p  = get_point(a + b, on_y_axis);
+    const Point *pa = GET_POINT(a, on_y_axis),
+                *pb = GET_POINT(b, on_y_axis),
+                *p  = GET_POINT(a + b, on_y_axis);
 
     if (pa == nullptr || pb == nullptr)
         return nullptr;
@@ -41,9 +40,9 @@ const Point *Calculator::get_add(constr_num a, constr_num b, bool on_y_axis)
 
 const Point *Calculator::get_sub(constr_num a, constr_num b, bool on_y_axis)
 {
-    const Point *pa = get_point(a, on_y_axis),
-                *pb = get_point(b, on_y_axis),
-                *p  = get_point(a - b, on_y_axis);
+    const Point *pa = GET_POINT(a, on_y_axis),
+                *pb = GET_POINT(b, on_y_axis),
+                *p  = GET_POINT(a - b, on_y_axis);
 
     if (pa == nullptr || pb == nullptr)
         return nullptr;
@@ -62,9 +61,9 @@ const Point *Calculator::get_sub(constr_num a, constr_num b, bool on_y_axis)
 
 const Point *Calculator::get_mul(constr_num a, constr_num b, bool on_y_axis)
 {
-    const Point *pa = get_point(a, on_y_axis),
-                *pb = get_point(b, !on_y_axis),
-                *p  = get_point(a * b, on_y_axis);
+    const Point *pa = GET_POINT(a, on_y_axis),
+                *pb = GET_POINT(b, !on_y_axis),
+                *p  = GET_POINT(a * b, on_y_axis);
 
     if (pa == nullptr || pb == nullptr)
         return nullptr;
@@ -82,9 +81,9 @@ const Point *Calculator::get_div(constr_num a, constr_num b, bool on_y_axis)
     if (b == 0)
         return nullptr;
 
-    const Point *pa = get_point(a, on_y_axis),
-                *pb = get_point(b, !on_y_axis),
-                *p  = get_point(a / b, on_y_axis);
+    const Point *pa = GET_POINT(a, on_y_axis),
+                *pb = GET_POINT(b, !on_y_axis),
+                *p  = GET_POINT(a / b, on_y_axis);
 
     if (pa == nullptr || pb == nullptr)
         return nullptr;
@@ -99,9 +98,9 @@ const Point *Calculator::get_div(constr_num a, constr_num b, bool on_y_axis)
 
 const Point *Calculator::get_sqrt(constr_num a, bool on_y_axis)
 {
-    const Point *pa =  get_point(a, on_y_axis),
-                *neg = get_point(-1, on_y_axis),
-                *p   = get_point(sqrt(a), on_y_axis);
+    const Point *pa =  GET_POINT(a, on_y_axis),
+                *neg = GET_POINT(-1, on_y_axis),
+                *p   = GET_POINT(sqrt(a), on_y_axis);
 
     if (pa == nullptr || a < 0)
         return nullptr;
@@ -122,7 +121,7 @@ const Point *Calculator::construct_number(constr_num n, bool on_y_axis)
 {
     switch (n.expr->type) {
     case 0:
-        return get_point(n, on_y_axis);
+        return GET_POINT(n, on_y_axis);
     case 1:
         switch (n.expr->expr_union.unary.op) {
         case 1:

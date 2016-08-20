@@ -20,10 +20,13 @@ SOURCES += \
     test/core_test.cpp \
     test/geom_test.cpp \
     src/core/constr_num_ops.cpp \
-    src/core/calculator.cpp
+    src/core/calculator.cpp \
+    src/cli/parser.cpp \
+    src/cli/cli.cpp
 
 HEADERS += \
     include/core.h \
     include/constr_num.h \
     include/geom.h \
-    include/calculator.h
+    include/calculator.h \
+    include/cli.h
