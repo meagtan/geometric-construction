@@ -79,11 +79,13 @@ public:
     const Line *reflect(const Line &a, const Point &pivot);
     const Line *reflect(const Line &a, const Line &pivot);
 
+    /*
     const Line *rotate(const Line &l, const Angle &a, const Point &pivot);
     const LineSegment *rotate(const LineSegment &l, const Angle &a);
 
     const Angle *add(const Angle &a, const Angle &b);
     const Angle *multiply(const Angle &a, int n);
+    */
 };
 
 #endif // GEOM_H

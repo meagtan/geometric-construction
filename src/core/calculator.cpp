@@ -1,7 +1,7 @@
 #include "include/calculator.h"
 #include <assert.h>
 
-#define GET_POINT(n, on_y_axis) (on_y_axis) ? GET_POINT(n) : GET_POINT(0, n)
+#define GET_POINT(n, on_y_axis) (on_y_axis) ? get_point(n) : get_point(0, n)
 
 Calculator::Calculator(MoveListener *lis) : Constructor(lis) {}
 

@@ -309,7 +309,7 @@ const Line *Constructor::reflect(const Line &a, const Line &pivot)
     return join_line(*vertex, *p);
 }
 
-// The following algorithms don't work:
+/*
 
 // pivot is assumed to be in the internal region of the angle of rotation
 const Line *Constructor::rotate(const Line &l, const Angle &a, const Point &pivot)
@@ -383,5 +383,6 @@ const LineSegment *Constructor::rotate(const LineSegment &l, const Angle &a)
     assert(l3 != nullptr);
 
     return translate(*l3, l.start);
-    */
+    * /
 }
+*/
