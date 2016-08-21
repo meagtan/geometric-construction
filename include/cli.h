@@ -32,23 +32,22 @@ struct Shape {
         const struct Circle *c;
         const LineSegment *s;
         const struct Angle  *a;
-        const constr_num *n;
 
         Member(const struct Point  *);
         Member(const struct Line   *);
         Member(const struct Circle *);
         Member(const LineSegment   *);
         Member(const struct Angle  *);
-        Member(const constr_num *);
     } u;
+    const constr_num n;
 
     Shape(const struct Point  *);
     Shape(const struct Line   *);
     Shape(const struct Circle *);
     Shape(const LineSegment   *);
     Shape(const struct Angle  *);
-    Shape(const constr_num *);
-    // Shape(const Shape &);
+    Shape(constr_num);
+    Shape(const Shape &);
     ~Shape(); // does not delete pointer
 };
 
@@ -66,7 +65,7 @@ struct Dictionary {
     string add(string name, Shape shape); // assigns given name to shape if not already assigned, in which case assigns default name
 };
 
-typedef Shape (*CommandFunc)(Calculator &, Shape, Shape, Shape);
+typedef Shape (*CommandFunc)(Calculator &, Shape[]);
 
 struct Command {
     vector<Shape::Type> args;
@@ -97,13 +96,13 @@ public:
 
 #define UNARY_COMMAND_OBJ(command, type, arg) \
     Command({Shape::Type::type}, \
-        +[](Calculator &c, Shape shape, Shape, Shape) { return Shape(c.command(*shape.u.arg)); })
+        +[](Calculator &c, Shape shapes[]) { return Shape(c.command(*shapes[0].u.arg)); })
 #define BINARY_COMMAND_OBJ(command, type1, arg1, type2, arg2) \
     Command({Shape::Type::type1, Shape::Type::type2}, \
-        +[](Calculator &c, Shape shape1, Shape shape2, Shape) { return Shape(c.command(*shape1.u.arg1, *shape2.u.arg2)); })
+        +[](Calculator &c, Shape shapes[]) { return Shape(c.command(*shapes[0].u.arg1, *shapes[1].u.arg2)); })
 #define TERNARY_COMMAND_OBJ(command, type1, arg1, type2, arg2, type3, arg3) \
     Command({Shape::Type::type1, Shape::Type::type2, Shape::Type::type3},\
-        +[](Calculator &c, Shape shape1, Shape shape2, Shape shape3) { return Shape(c.command(*shape1.u.arg1, *shape2.u.arg2, *shape3.u.arg3)); })
+        +[](Calculator &c, Shape shapes[]) { return Shape(c.command(*shapes[0].u.arg1, *shapes[1].u.arg2, *shapes[2].u.arg3)); })
 
 #define UNARY_COMMAND(command, ...) \
     {#command, UNARY_COMMAND_OBJ(command, __VA_ARGS__)}
@@ -114,10 +113,10 @@ public:
 
 #define UNARY_OPERATOR(name) \
     {#name, Command({Shape::Type::Number}, \
-             +[](Calculator &c, Shape shape, Shape, Shape) { return Shape(c.get_##name(*shape.u.n)); })}
+             +[](Calculator &c, Shape shapes[]) { return Shape(c.get_##name(shapes[0].n)); })}
 #define BINARY_OPERATOR(name) \
     {#name, Command({Shape::Type::Number, Shape::Type::Number}, \
-             +[](Calculator &c, Shape shape1, Shape shape2, Shape) { return Shape(c.get_##name(*shape1.u.n, *shape2.u.n)); })}
+             +[](Calculator &c, Shape shapes[]) { return Shape(c.get_##name(shapes[0].n, shapes[1].n)); })}
 
 const unordered_multimap<string,Command> commands ({{
     // unary commands

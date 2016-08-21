@@ -60,14 +60,13 @@ MEMBER_CONSTR(struct Line, l)
 MEMBER_CONSTR(struct Circle, c)
 MEMBER_CONSTR(LineSegment, s)
 MEMBER_CONSTR(struct Angle, a)
-MEMBER_CONSTR(constr_num, n)
 
 SHAPE_CONSTR(struct Point, Point, p)
 SHAPE_CONSTR(struct Line, Line, l)
 SHAPE_CONSTR(struct Circle, Circle, c)
 SHAPE_CONSTR(LineSegment, Segment, s)
 SHAPE_CONSTR(struct Angle, Angle, a)
-SHAPE_CONSTR(constr_num, Number, n)
+Shape::Shape(constr_num n) : type(Number), u((const struct Point *) nullptr), n(n) {}
 
 #undef MEMBER_CONSTR
 #undef SHAPE_CONSTR
@@ -91,6 +90,8 @@ Shape::Shape(const Shape &other) : type(other.type)
     }
 }
 */
+
+Shape::Shape(const Shape &other) : type(other.type), u(other.u) {}
 
 Shape::~Shape() {}
 
