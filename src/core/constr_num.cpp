@@ -1,6 +1,11 @@
 #include "include/constr_num.h"
 #include <cmath>
 
+constr_num::constr_num()
+{
+    expr = constant(0);
+}
+
 constr_num::constr_num(int value)
 {
     expr = constant(value);

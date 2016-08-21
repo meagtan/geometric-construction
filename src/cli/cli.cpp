@@ -12,6 +12,7 @@ CLIProgram::~CLIProgram() {}
 void CLIProgram::input(string query)
 {
     // the first word in query represents the command, the rest are arguments partitioned by semicolons
+    // the arguments can be either direct expressions to be parsed for numbers and points (call get_point) or variables
     // throw exception for parse error
 }
 
@@ -49,36 +50,29 @@ void CLIProgram::meet(const Line *l1, const Line *l2, const Point *p)
 
 // Shape
 
-Shape::Shape(const struct Point *p) : type(Point)
-{
-    u.p = p;
-}
+#define MEMBER_CONSTR(_type, _arg) \
+    Shape::Member::Member(const _type *_arg) : _arg(_arg) {}
+#define SHAPE_CONSTR(_class, _type, _arg) \
+    Shape::Shape(const _class *_arg) : type(_type), u(_arg) {}
 
-Shape::Shape(const struct Line *l) : type(Line)
-{
-    u.l = l;
-}
+MEMBER_CONSTR(struct Point, p)
+MEMBER_CONSTR(struct Line, l)
+MEMBER_CONSTR(struct Circle, c)
+MEMBER_CONSTR(LineSegment, s)
+MEMBER_CONSTR(struct Angle, a)
+MEMBER_CONSTR(constr_num, n)
 
-Shape::Shape(const struct Circle *c) : type(Circle)
-{
-    u.c = c;
-}
+SHAPE_CONSTR(struct Point, Point, p)
+SHAPE_CONSTR(struct Line, Line, l)
+SHAPE_CONSTR(struct Circle, Circle, c)
+SHAPE_CONSTR(LineSegment, Segment, s)
+SHAPE_CONSTR(struct Angle, Angle, a)
+SHAPE_CONSTR(constr_num, Number, n)
 
-Shape::Shape(const LineSegment *s) : type(Segment)
-{
-    u.s = s;
-}
+#undef MEMBER_CONSTR
+#undef SHAPE_CONSTR
 
-Shape::Shape(const struct Angle *a) : type(Angle)
-{
-    u.a = a;
-}
-
-Shape::Shape(const constr_num n) : type(Number)
-{
-    u.n = n;
-}
-
+/*
 Shape::Shape(const Shape &other) : type(other.type)
 {
     switch (type) {
@@ -96,8 +90,13 @@ Shape::Shape(const Shape &other) : type(other.type)
         u.n = other.n;
     }
 }
+*/
 
 Shape::~Shape() {}
 
 // Dictionary
 
+// Command
+
+Command::Command(vector<Shape::Type> args, CommandFunc fun)
+    : args(args), fun(fun) {}

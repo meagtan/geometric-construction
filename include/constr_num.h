@@ -57,7 +57,8 @@ class constr_num {
     void print(ostream &s, Expr *expr, bool parenthesize = 0) const; // parenthesize only concerns this being a binary expression
 
 public:
-    constr_num(int value = 0);
+    constr_num();
+    constr_num(int value);
     constr_num(const constr_num &other);
     ~constr_num();
 

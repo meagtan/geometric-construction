@@ -4,11 +4,18 @@
 #include "calculator.h"
 #include <string>
 #include <map>
+#include <unordered_map>
+#include <utility>
 #include <cstdarg>
+#include <functional>
 
 using std::string;
 using std::map;
-using std::multimap;
+using std::pair;
+using std::unordered_multimap;
+using std::function;
+
+// all this for what would amount to a simple apply call in lisp
 
 struct Shape {
     const enum Type {
@@ -19,13 +26,20 @@ struct Shape {
         Angle,
         Number
     } type;
-    const union {
+    const union Member {
         const struct Point  *p;
         const struct Line   *l;
         const struct Circle *c;
         const LineSegment *s;
         const struct Angle  *a;
-        constr_num n;
+        const constr_num *n;
+
+        Member(const struct Point  *);
+        Member(const struct Line   *);
+        Member(const struct Circle *);
+        Member(const LineSegment   *);
+        Member(const struct Angle  *);
+        Member(const constr_num *);
     } u;
 
     Shape(const struct Point  *);
@@ -33,8 +47,8 @@ struct Shape {
     Shape(const struct Circle *);
     Shape(const LineSegment   *);
     Shape(const struct Angle  *);
-    Shape(const constr_num);
-    Shape(const Shape &);
+    Shape(const constr_num *);
+    // Shape(const Shape &);
     ~Shape(); // does not delete pointer
 };
 
@@ -52,11 +66,13 @@ struct Dictionary {
     string add(string name, Shape shape); // assigns given name to shape if not already assigned, in which case assigns default name
 };
 
+typedef Shape (*CommandFunc)(Calculator &, Shape, Shape, Shape);
+
 struct Command {
     vector<Shape::Type> args;
-    Shape (*fun)(Calculator &, Shape...);
+    CommandFunc fun;
 
-    Command(vector<Shape::Type> args, Shape (*fun)(Calculator &, Shape...));
+    Command(vector<Shape::Type> args, CommandFunc fun);
     ~Command() = default;
 };
 
@@ -80,13 +96,14 @@ public:
 };
 
 #define UNARY_COMMAND_OBJ(command, type, arg) \
-    {{Shape::Type::type}, [](Calculator &c, Shape shape, ...) { return c.command(*shape.u.arg); }}
+    Command({Shape::Type::type}, \
+        +[](Calculator &c, Shape shape, Shape, Shape) { return Shape(c.command(*shape.u.arg)); })
 #define BINARY_COMMAND_OBJ(command, type1, arg1, type2, arg2) \
-    {{Shape::Type::type1, Shape::Type::type2}, \
-     [](Calculator &c, Shape shape1, Shape shape2, ...) { return c.command(*shape1.u.arg1, *shape2.u.arg2); }}
+    Command({Shape::Type::type1, Shape::Type::type2}, \
+        +[](Calculator &c, Shape shape1, Shape shape2, Shape) { return Shape(c.command(*shape1.u.arg1, *shape2.u.arg2)); })
 #define TERNARY_COMMAND_OBJ(command, type1, arg1, type2, arg2, type3, arg3) \
-    {{Shape::Type::type1, Shape::Type::type2, Shape::Type::type3}, \
-     [](Calculator &c, Shape shape1, Shape shape2, Shape shape3, ...) { return c.command(*shape1.u.arg1, *shape2.u.arg2, *shape3.u.arg3); }}
+    Command({Shape::Type::type1, Shape::Type::type2, Shape::Type::type3},\
+        +[](Calculator &c, Shape shape1, Shape shape2, Shape shape3) { return Shape(c.command(*shape1.u.arg1, *shape2.u.arg2, *shape3.u.arg3)); })
 
 #define UNARY_COMMAND(command, ...) \
     {#command, UNARY_COMMAND_OBJ(command, __VA_ARGS__)}
@@ -96,13 +113,13 @@ public:
     {#command, TERNARY_COMMAND_OBJ(command, __VA_ARGS__)}
 
 #define UNARY_OPERATOR(name) \
-    {#name, {{Shape::Type::Number}, \
-             [](Calculator &c, Shape shape, ...) { return c.get_##name(shape.u.n); }}}
+    {#name, Command({Shape::Type::Number}, \
+             +[](Calculator &c, Shape shape, Shape, Shape) { return Shape(c.get_##name(*shape.u.n)); })}
 #define BINARY_OPERATOR(name) \
-    {#name, {{Shape::Type::Number, Shape::Type::Number}, \
-             [](Calculator &c, Shape shape1, Shape shape2, ...) { return c.get_##name(shape1.u.n, shape2.u.n); }}}
+    {#name, Command({Shape::Type::Number, Shape::Type::Number}, \
+             +[](Calculator &c, Shape shape1, Shape shape2, Shape) { return Shape(c.get_##name(*shape1.u.n, *shape2.u.n)); })}
 
-const multimap<string,Command> commands = {
+const unordered_multimap<string,Command> commands ({{
     // unary commands
     //  constructor
     UNARY_COMMAND(bisect, Segment, s),
@@ -115,7 +132,7 @@ const multimap<string,Command> commands = {
     //  scope
     {"straightedge", BINARY_COMMAND_OBJ(join_line, Point, p, Point, p)},
     {"compass", BINARY_COMMAND_OBJ(join_circle, Point, p, Point, p)},
-    BINARY_COMMAND(meet, Circle, c, Circle, c),
+    BINARY_COMMAND(meet, Circle, c, Circle, c), // doesn't work for pairs, instead send result to CLIProgram
     BINARY_COMMAND(meet, Line, l, Circle, c),
     BINARY_COMMAND(meet, Line, l, Line, l),
     //  constructor
@@ -138,6 +155,6 @@ const multimap<string,Command> commands = {
 
     // ternary commands
     {"make_angle", TERNARY_COMMAND_OBJ(join_angle, Point, p, Point, p, Point, p)}
-};
+}});
 
 #endif // CLI_H
