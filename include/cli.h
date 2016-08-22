@@ -65,7 +65,28 @@ struct Dictionary {
     string add(string name, Shape shape); // assigns given name to shape if not already assigned, in which case assigns default name
 };
 
-typedef Shape (*CommandFunc)(Calculator &, Shape[]);
+class CLIProgram : private MoveListener {
+    friend class Calculator;
+
+    Calculator c;
+    Dictionary d;
+
+    void straightedge(const Point*, const Point*, const Line*);
+    void compass(const Point*, const Point*, const Circle*);
+    void meet(const Circle*, const Circle*, const Point*);
+    void meet(const Line*, const Circle*, const Point*);
+    void meet(const Line*, const Line*, const Point*);
+
+public:
+    CLIProgram();
+    ~CLIProgram();
+
+    void input(string query);
+
+    void add(Shape);
+};
+
+typedef void (*CommandFunc)(CLIProgram &, Calculator &, Shape[]);
 
 struct Command {
     vector<Shape::Type> args;
@@ -75,34 +96,15 @@ struct Command {
     ~Command() = default;
 };
 
-class CLIProgram : private MoveListener {
-    friend class Calculator;
-
-    void straightedge(const Point*, const Point*, const Line*);
-    void compass(const Point*, const Point*, const Circle*);
-    void meet(const Circle*, const Circle*, const Point*);
-    void meet(const Line*, const Circle*, const Point*);
-    void meet(const Line*, const Line*, const Point*);
-
-    Calculator c;
-    Dictionary d;
-
-public:
-    CLIProgram();
-    ~CLIProgram();
-
-    void input(string query);
-};
-
 #define UNARY_COMMAND_OBJ(command, type, arg) \
     Command({Shape::Type::type}, \
-        +[](Calculator &c, Shape shapes[]) { return Shape(c.command(*shapes[0].u.arg)); })
+        +[](CLIProgram &p, Calculator &c, Shape shapes[]) { p.add(c.command(*shapes[0].u.arg)); })
 #define BINARY_COMMAND_OBJ(command, type1, arg1, type2, arg2) \
     Command({Shape::Type::type1, Shape::Type::type2}, \
-        +[](Calculator &c, Shape shapes[]) { return Shape(c.command(*shapes[0].u.arg1, *shapes[1].u.arg2)); })
+        +[](CLIProgram &p, Calculator &c, Shape shapes[]) { p.add(c.command(*shapes[0].u.arg1, *shapes[1].u.arg2)); })
 #define TERNARY_COMMAND_OBJ(command, type1, arg1, type2, arg2, type3, arg3) \
     Command({Shape::Type::type1, Shape::Type::type2, Shape::Type::type3},\
-        +[](Calculator &c, Shape shapes[]) { return Shape(c.command(*shapes[0].u.arg1, *shapes[1].u.arg2, *shapes[2].u.arg3)); })
+        +[](CLIProgram &p, Calculator &c, Shape shapes[]) { p.add(c.command(*shapes[0].u.arg1, *shapes[1].u.arg2, *shapes[2].u.arg3)); })
 
 #define UNARY_COMMAND(command, ...) \
     {#command, UNARY_COMMAND_OBJ(command, __VA_ARGS__)}
@@ -113,12 +115,18 @@ public:
 
 #define UNARY_OPERATOR(name) \
     {#name, Command({Shape::Type::Number}, \
-             +[](Calculator &c, Shape shapes[]) { return Shape(c.get_##name(shapes[0].n)); })}
+             +[](CLIProgram &p, Calculator &c, Shape shapes[]) { p.add(c.get_##name(shapes[0].n)); })}
 #define BINARY_OPERATOR(name) \
     {#name, Command({Shape::Type::Number, Shape::Type::Number}, \
-             +[](Calculator &c, Shape shapes[]) { return Shape(c.get_##name(shapes[0].n, shapes[1].n)); })}
+             +[](CLIProgram &p, Calculator &c, Shape shapes[]) { p.add(c.get_##name(shapes[0].n, shapes[1].n)); })}
 
-const unordered_multimap<string,Command> commands ({{
+#define BINARY_COMMAND_PAIR(command, type1, arg1, type2, arg2) \
+    {#command, Command({Shape::Type::type1, Shape::Type::type2}, \
+                        +[](CLIProgram &p, Calculator &c, Shape shapes[]) { \
+                            auto pair = c.command(*shapes[0].u.arg1, *shapes[1].u.arg2); \
+                            p.add(pair.first); p.add(pair.second);})}
+
+const unordered_multimap<string,Command> commands ({
     // unary commands
     //  constructor
     UNARY_COMMAND(bisect, Segment, s),
@@ -131,8 +139,8 @@ const unordered_multimap<string,Command> commands ({{
     //  scope
     {"straightedge", BINARY_COMMAND_OBJ(join_line, Point, p, Point, p)},
     {"compass", BINARY_COMMAND_OBJ(join_circle, Point, p, Point, p)},
-    BINARY_COMMAND(meet, Circle, c, Circle, c), // doesn't work for pairs, instead send result to CLIProgram
-    BINARY_COMMAND(meet, Line, l, Circle, c),
+    BINARY_COMMAND_PAIR(meet, Circle, c, Circle, c), // doesn't work for pairs, instead send result to CLIProgram
+    BINARY_COMMAND_PAIR(meet, Line, l, Circle, c),
     BINARY_COMMAND(meet, Line, l, Line, l),
     //  constructor
     {"make_segment", BINARY_COMMAND_OBJ(join_segment, Point, p, Point, p)},
@@ -154,6 +162,6 @@ const unordered_multimap<string,Command> commands ({{
 
     // ternary commands
     {"make_angle", TERNARY_COMMAND_OBJ(join_angle, Point, p, Point, p, Point, p)}
-}});
+});
 
 #endif // CLI_H
