@@ -49,6 +49,9 @@ struct Shape {
     Shape(constr_num);
     Shape(const Shape &);
     ~Shape(); // does not delete pointer
+private:
+    string name = "";
+    friend struct Dictionary;
 };
 
 struct Dictionary {
@@ -57,15 +60,19 @@ struct Dictionary {
     Dictionary();
     ~Dictionary();
 
-    Shape get_shape(string name);
-    string get_name(Shape name);
+    Shape *get_shape(string name);
+    string get_name(Shape shape);
 
     // automatically coerces pointers taken as arguments
     string add(Shape shape); // assigns default name to shape
     string add(string name, Shape shape); // assigns given name to shape if not already assigned, in which case assigns default name
+private:
+    int counter[6] = {0};
+    char letters[6] = {'P', 'L', 'C', 'S', 'A', 'N'};
+    string generate_name(int type);
 };
 
-class CLIProgram : private MoveListener {
+class CLIProgram : protected MoveListener {
     friend class Calculator;
 
     Calculator c;

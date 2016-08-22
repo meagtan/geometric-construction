@@ -14,6 +14,8 @@ void CLIProgram::input(string query)
     // the first word in query represents the command, the rest are arguments partitioned by semicolons
     // the arguments can be either direct expressions to be parsed for numbers and points (call get_point) or variables
     // throw exception for parse error
+
+    // don't pass this to command, pass a lambda or function pointer that can optionally set a name for the results of the command
 }
 
 // perhaps make these communicate with input() and wait until every name is assigned before printing
@@ -48,6 +50,12 @@ void CLIProgram::meet(const Line *l1, const Line *l2, const Point *p)
     cout << name << " = meet " << d.get_name(l1) << "; " << d.get_name(l2) << endl;
 }
 
+// called from command, distinguished from the shapes added using the moves above
+void CLIProgram::add(Shape shape)
+{
+
+}
+
 // Shape
 
 #define MEMBER_CONSTR(_type, _arg) \
@@ -71,31 +79,52 @@ Shape::Shape(constr_num n) : type(Number), u((const struct Point *) nullptr), n(
 #undef MEMBER_CONSTR
 #undef SHAPE_CONSTR
 
-/*
-Shape::Shape(const Shape &other) : type(other.type)
-{
-    switch (type) {
-    case Point:
-        u.p = other.p;
-    case Line:
-        u.l = other.l;
-    case Circle:
-        u.c = other.c;
-    case Segment:
-        u.s = other.s;
-    case Angle:
-        u.a = other.a;
-    case Number:
-        u.n = other.n;
-    }
-}
-*/
-
 Shape::Shape(const Shape &other) : type(other.type), u(other.u) {}
 
 Shape::~Shape() {}
 
 // Dictionary
+
+Dictionary::Dictionary() {}
+Dictionary::~Dictionary() {}
+
+Shape *Dictionary::get_shape(string name)
+{
+    auto iter = shapes.find(name);
+    if (iter != shapes.end())
+        return &iter->second;
+    return nullptr;
+}
+
+string Dictionary::get_name(Shape shape)
+{
+    return shape.name;
+}
+
+string Dictionary::add(Shape shape)
+{
+    // should also include when shape.name == ""
+    if (shapes.find(shape.name) == shapes.end()) {
+        shape.name = generate_name(shape.type);
+        shapes.emplace(std::make_pair(shape.name, shape));
+    }
+    return shape.name;
+}
+
+string Dictionary::add(string name, Shape shape)
+{
+    if (shapes.find(shape.name) != shapes.end())
+        shapes.erase(shape.name);
+    shape.name = name;
+    shapes.emplace(std::make_pair(name, shape));
+    return name;
+}
+
+// TODO make this distinguish primary results of a command from other shapes, perhaps through names
+string Dictionary::generate_name(int type)
+{
+    return letters[type] + std::to_string(counter[type]++);
+}
 
 // Command
 
