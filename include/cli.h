@@ -41,6 +41,7 @@ struct Shape {
     } u;
     const constr_num n;
 
+    Shape();
     Shape(const struct Point  *);
     Shape(const struct Line   *);
     Shape(const struct Circle *);
@@ -49,6 +50,10 @@ struct Shape {
     Shape(constr_num);
     Shape(const Shape &);
     ~Shape(); // does not delete pointer
+
+    Shape &operator=(const Shape &);
+    bool operator==(const Shape &) const;
+
 private:
     string name = "";
     friend struct Dictionary;
@@ -78,19 +83,23 @@ class CLIProgram : protected MoveListener {
     Calculator c;
     Dictionary d;
 
+    bool running = true;
+
     void straightedge(const Point*, const Point*, const Line*);
     void compass(const Point*, const Point*, const Circle*);
     void meet(const Circle*, const Circle*, const Point*);
     void meet(const Line*, const Circle*, const Point*);
     void meet(const Line*, const Line*, const Point*);
 
+    Shape parse_arg(string input, Shape::Type type);
 public:
     CLIProgram();
     ~CLIProgram();
 
     void input(string query);
-
     void add(Shape);
+    void quit();
+    bool running();
 };
 
 typedef void (*CommandFunc)(CLIProgram &, Calculator &, Shape[]);
@@ -134,6 +143,7 @@ struct Command {
                             p.add(pair.first); p.add(pair.second);})}
 
 const unordered_multimap<string,Command> commands ({
+    {"quit", Command({}, +[](CLIProgram &p, Calculator &c, Shape shapes[]){p.quit();})},
     // unary commands
     //  constructor
     UNARY_COMMAND(bisect, Segment, s),
@@ -170,5 +180,9 @@ const unordered_multimap<string,Command> commands ({
     // ternary commands
     {"make_angle", TERNARY_COMMAND_OBJ(join_angle, Point, p, Point, p, Point, p)}
 });
+
+constexpr char delim = ';'; // delimiter for arguments
+constexpr string types[] = {"Point", "Line", "Circle", "Segment", "Angle", "Number"};
+const Shape null_shape;
 
 #endif // CLI_H
