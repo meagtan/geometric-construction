@@ -16,9 +16,9 @@ CLIProgram::~CLIProgram() {}
 void CLIProgram::input(string query)
 {
     int start, comm_end;
-    Command comm;
     vector<Shape> args;
     Shape arg;
+    bool found;
 
     // skip leading whitespace and find command
     for (start = 0; start != query.length() && isspace(query[start]); ++start);
@@ -36,8 +36,9 @@ void CLIProgram::input(string query)
     // try each set of arguments viable for commands in comm_range
     // TODO clean this up and convert skips into conditionals
     for (auto pair = comm_range.first; pair != comm_range.second; ++pair) {
-        comm = pair->second;
+        auto comm = pair->second;
         args.clear();
+        found = true;
 
         // skip for invalid number of arguments
         if (std::count(query.begin() + comm_end, query.end(), delim) != PRED(comm.args.size()))
@@ -49,8 +50,10 @@ void CLIProgram::input(string query)
             arg = parse_arg(query.substr(pos, query.find(delim, pos)), comm.args[i]);
 
             // if argument cannot be parsed, skip to next command
-            if (arg == null_shape)
-                goto cont;
+            if (arg == null_shape) {
+                found = false;
+                break;
+            }
 
             args.push_back(arg);
 
@@ -60,10 +63,10 @@ void CLIProgram::input(string query)
         }
 
         // apply args to command and exit
-        (*comm.fun)(*this, c, args.data());
-        return;
-
-        cont:
+        if (found) {
+            (*comm.fun)(*this, c, args.data());
+            return;
+        }
     }
 
     // no matching command found, alert user
@@ -126,7 +129,7 @@ void CLIProgram::add(Shape shape)
 }
 
 void CLIProgram::quit() { running = false; }
-bool CLIProgram::running() { return running; }
+bool CLIProgram::is_running() { return running; }
 
 // Shape
 

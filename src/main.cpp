@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
     CLIProgram p;
     string s;
 
-    while (p.running()) {
+    while (p.is_running()) {
         // prompt for input
         cout << "> ";
-        std::getline(cin, s);
+        std::getline(std::cin, s);
 
         p.input(s);
     }

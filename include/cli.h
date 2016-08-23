@@ -26,7 +26,7 @@ struct Shape {
         Angle,
         Number
     } type;
-    const union Member {
+    union Member {
         const struct Point  *p;
         const struct Line   *l;
         const struct Circle *c;
@@ -39,7 +39,7 @@ struct Shape {
         Member(const LineSegment   *);
         Member(const struct Angle  *);
     } u;
-    const constr_num n;
+    constr_num n;
 
     Shape();
     Shape(const struct Point  *);
@@ -99,7 +99,7 @@ public:
     void input(string query);
     void add(Shape);
     void quit();
-    bool running();
+    bool is_running();
 };
 
 typedef void (*CommandFunc)(CLIProgram &, Calculator &, Shape[]);
@@ -182,7 +182,7 @@ const unordered_multimap<string,Command> commands ({
 });
 
 constexpr char delim = ';'; // delimiter for arguments
-constexpr string types[] = {"Point", "Line", "Circle", "Segment", "Angle", "Number"};
+const string types[] = {"Point", "Line", "Circle", "Segment", "Angle", "Number"};
 const Shape null_shape;
 
 #endif // CLI_H
