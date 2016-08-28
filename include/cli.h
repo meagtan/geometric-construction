@@ -2,18 +2,27 @@
 #define CLI_H
 
 #include "calculator.h"
-#include <string>
-#include <map>
-#include <unordered_map>
-#include <utility>
+
+#include <algorithm>
+#include <cctype>
 #include <cstdarg>
 #include <functional>
+#include <map>
+#include <queue>
+#include <sstream>
+#include <stack>
+#include <string>
+#include <unordered_map>
+#include <utility>
 
-using std::string;
+using std::function;
+using std::isspace;
+using std::istringstream;
 using std::map;
 using std::pair;
+using std::stack;
+using std::string;
 using std::unordered_multimap;
-using std::function;
 
 // all this for what would amount to a simple apply call in lisp
 
@@ -41,7 +50,6 @@ struct Shape {
     } u;
     constr_num n;
 
-    Shape();
     Shape(const struct Point  *);
     Shape(const struct Line   *);
     Shape(const struct Circle *);
@@ -91,7 +99,8 @@ class CLIProgram : protected MoveListener {
     void meet(const Line*, const Circle*, const Point*);
     void meet(const Line*, const Line*, const Point*);
 
-    Shape parse_arg(string input, Shape::Type type);
+    void parse_arg(Shape *shape, string input, Shape::Type type);
+    void parse_num(constr_num *num, std::istream &str);
 public:
     CLIProgram();
     ~CLIProgram();
@@ -100,6 +109,13 @@ public:
     void add(Shape);
     void quit();
     bool is_running();
+
+    void print(const Point &);
+    void print(const Line &);
+    void print(const Circle &);
+    void print(const LineSegment &);
+    void print(const Angle &);
+    void print(constr_num);
 };
 
 typedef void (*CommandFunc)(CLIProgram &, Calculator &, Shape[]);
@@ -126,8 +142,6 @@ struct Command {
     {#command, UNARY_COMMAND_OBJ(command, __VA_ARGS__)}
 #define BINARY_COMMAND(command, ...) \
     {#command, BINARY_COMMAND_OBJ(command, __VA_ARGS__)}
-#define TERNARY_COMMAND(command, ...) \
-    {#command, TERNARY_COMMAND_OBJ(command, __VA_ARGS__)}
 
 #define UNARY_OPERATOR(name) \
     {#name, Command({Shape::Type::Number}, \
@@ -142,8 +156,18 @@ struct Command {
                             auto pair = c.command(*shapes[0].u.arg1, *shapes[1].u.arg2); \
                             p.add(pair.first); p.add(pair.second);})}
 
+#define PRINT_COMM(_type, _arg) \
+    {"print", Command({Shape::Type::_type}, +[](CLIProgram &p, Calculator &, Shape shapes[]) { \
+                                                   p.print(*shapes[0].u._arg); })}
+
 const unordered_multimap<string,Command> commands ({
     {"quit", Command({}, +[](CLIProgram &p, Calculator &c, Shape shapes[]){p.quit();})},
+    PRINT_COMM(Point, p),
+    PRINT_COMM(Line, l),
+    PRINT_COMM(Circle, c),
+    PRINT_COMM(Segment, s),
+    PRINT_COMM(Angle, a),
+    {"print", Command({Shape::Type::Number}, +[](CLIProgram &p, Calculator, Shape shapes[]) {p.print(shapes[0].n);})},
     // unary commands
     //  constructor
     UNARY_COMMAND(bisect, Segment, s),
@@ -181,8 +205,16 @@ const unordered_multimap<string,Command> commands ({
     {"make_angle", TERNARY_COMMAND_OBJ(join_angle, Point, p, Point, p, Point, p)}
 });
 
+#undef UNARY_COMMAND
+#undef UNARY_COMMAND_OBJ
+#undef UNARY_OPERATOR
+#undef BINARY_COMMAND
+#undef BINARY_COMMAND_OBJ
+#undef BINARY_OPERATOR
+#undef TERNARY_COMMAND_OBJ
+#undef PRINT_COMM
+
 constexpr char delim = ';'; // delimiter for arguments
 const string types[] = {"Point", "Line", "Circle", "Segment", "Angle", "Number"};
-const Shape null_shape;
 
 #endif // CLI_H

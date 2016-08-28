@@ -10,6 +10,41 @@
 
 // Arithmetic operations for constr_num
 
+constr_num constr_num::operator-() const
+{
+    return constr_num(negate(expr));
+}
+
+constr_num constr_num::operator+(const constr_num &a) const
+{
+    return constr_num(add(expr, a.expr));
+}
+
+constr_num constr_num::operator-(const constr_num &a) const
+{
+    return operator+(-a);
+}
+
+constr_num constr_num::operator*(const constr_num &a) const
+{
+    return constr_num(mul(expr, a.expr));
+}
+
+constr_num constr_num::operator/(const constr_num &a) const
+{
+    return operator*(a.inv());
+}
+
+constr_num constr_num::inv() const
+{
+    return constr_num(invert(expr));
+}
+
+constr_num sqrt(const constr_num &a)
+{
+    return constr_num(a._sqrt(a.expr));
+}
+
 constr_num::Expr *constr_num::constant(int value) const
 {
     Expr *e = new Expr();
@@ -163,39 +198,4 @@ constr_num::Expr *constr_num::mul(Expr *e1, Expr *e2) const
     e->expr_union.binary.arg1 = copy(e1);
     e->expr_union.binary.arg2 = copy(e2);
     return e;
-}
-
-constr_num constr_num::operator-() const
-{
-    return constr_num(negate(expr));
-}
-
-constr_num constr_num::operator+(const constr_num &a) const
-{
-    return constr_num(add(expr, a.expr));
-}
-
-constr_num constr_num::operator-(const constr_num &a) const
-{
-    return operator+(-a);
-}
-
-constr_num constr_num::operator*(const constr_num &a) const
-{
-    return constr_num(mul(expr, a.expr));
-}
-
-constr_num constr_num::operator/(const constr_num &a) const
-{
-    return operator*(a.inv());
-}
-
-constr_num constr_num::inv() const
-{
-    return constr_num(invert(expr));
-}
-
-constr_num sqrt(const constr_num &a)
-{
-    return constr_num(a._sqrt(a.expr));
 }

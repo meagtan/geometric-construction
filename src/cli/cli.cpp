@@ -1,6 +1,4 @@
 #include "include/cli.h"
-#include <cctype>
-#include <algorithm>
 
 using std::cout;
 using std::endl;
@@ -13,11 +11,15 @@ CLIProgram::CLIProgram() : c(this) {}
 
 CLIProgram::~CLIProgram() {}
 
+// TODO
+// - Need a command to describe a shape given its name
+// - input() must output all the operations done through the MoveListener functions and the result through add()
+
 void CLIProgram::input(string query)
 {
     int start, comm_end;
     vector<Shape> args;
-    Shape arg;
+    Shape *arg = nullptr;
     bool found;
 
     // skip leading whitespace and find command
@@ -47,15 +49,15 @@ void CLIProgram::input(string query)
         // try to parse each argument based on its type
         for (int i = 0, pos = comm_end; i != comm.args.size(); ++i) {
             // parse argument
-            arg = parse_arg(query.substr(pos, query.find(delim, pos)), comm.args[i]);
+            parse_arg(arg, query.substr(pos, query.find(delim, pos)), comm.args[i]);
 
             // if argument cannot be parsed, skip to next command
-            if (arg == null_shape) {
+            if (arg == nullptr) {
                 found = false;
                 break;
             }
 
-            args.push_back(arg);
+            args.push_back(*arg);
 
             // move to after next delim and skip whitespace
             for (; comm_end != query.length() && query[comm_end] != delim; ++comm_end);
@@ -81,51 +83,6 @@ void CLIProgram::input(string query)
         }
         cout << endl;
     }
-
-    // the first word in query represents the command, the rest are arguments partitioned by semicolons
-
-    // the arguments can be either direct expressions to be parsed for numbers and points (call get_point) or variables
-    // throw exception for parse error
-
-    // don't pass this to command, pass a lambda or function pointer that can optionally set a name for the results of the command
-}
-
-// perhaps make these communicate with input() and wait until every name is assigned before printing
-
-void CLIProgram::straightedge(const Point *p1, const Point *p2, const Line *l)
-{
-    string name = d.add(l);
-    cout << name << " = straightedge " << d.get_name(p1) << "; " << d.get_name(p2) << endl;
-}
-
-void CLIProgram::compass(const Point *p1, const Point *p2, const Circle *c)
-{
-    string name = d.add(c);
-    cout << name << " = compass " << d.get_name(p1) << "; " << d.get_name(p2) << endl;
-}
-
-void CLIProgram::meet(const Circle *c1, const Circle *c2, const Point *p)
-{
-    string name = d.add(p);
-    cout << name << " = meet " << d.get_name(c1) << "; " << d.get_name(c2) << endl;
-}
-
-void CLIProgram::meet(const Line *l1, const Circle *c2, const Point *p)
-{
-    string name = d.add(p);
-    cout << name << " = meet " << d.get_name(l1) << "; " << d.get_name(c2) << endl;
-}
-
-void CLIProgram::meet(const Line *l1, const Line *l2, const Point *p)
-{
-    string name = d.add(p);
-    cout << name << " = meet " << d.get_name(l1) << "; " << d.get_name(l2) << endl;
-}
-
-// called from command, distinguished from the shapes added using the moves above
-void CLIProgram::add(Shape shape)
-{
-
 }
 
 void CLIProgram::quit() { running = false; }
@@ -144,7 +101,6 @@ MEMBER_CONSTR(struct Circle, c)
 MEMBER_CONSTR(LineSegment, s)
 MEMBER_CONSTR(struct Angle, a)
 
-Shape::Shape() : Shape((const struct Point *) nullptr) {}
 SHAPE_CONSTR(struct Point, Point, p)
 SHAPE_CONSTR(struct Line, Line, l)
 SHAPE_CONSTR(struct Circle, Circle, c)
