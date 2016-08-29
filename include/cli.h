@@ -8,13 +8,14 @@
 #include <cstdarg>
 #include <functional>
 #include <map>
-#include <queue>
 #include <sstream>
 #include <stack>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
+using std::cout;
+using std::endl;
 using std::function;
 using std::isspace;
 using std::istringstream;
@@ -101,6 +102,7 @@ class CLIProgram : protected MoveListener {
 
     void parse_arg(Shape *shape, string input, Shape::Type type);
     void parse_num(constr_num *num, std::istream &str);
+    void apply(int op, stack<constr_num> &output);
 public:
     CLIProgram();
     ~CLIProgram();
@@ -167,7 +169,7 @@ const unordered_multimap<string,Command> commands ({
     PRINT_COMM(Circle, c),
     PRINT_COMM(Segment, s),
     PRINT_COMM(Angle, a),
-    {"print", Command({Shape::Type::Number}, +[](CLIProgram &p, Calculator, Shape shapes[]) {p.print(shapes[0].n);})},
+    {"print", Command({Shape::Type::Number}, +[](CLIProgram &p, Calculator &, Shape shapes[]) {p.print(shapes[0].n);})},
     // unary commands
     //  constructor
     UNARY_COMMAND(bisect, Segment, s),

@@ -1,8 +1,5 @@
 #include "include/cli.h"
 
-using std::cout;
-using std::endl;
-
 #define PRED(n) ((n) > 0 ? (n) - 1 : (n))
 
 // CLIProgram
@@ -17,7 +14,7 @@ CLIProgram::~CLIProgram() {}
 
 void CLIProgram::input(string query)
 {
-    int start, comm_end;
+    size_t start, comm_end;
     vector<Shape> args;
     Shape *arg = nullptr;
     bool found;

@@ -1,5 +1,8 @@
 #include "include/cli.h"
 
+using std::cout;
+using std::endl;
+
 // CLIProgram
 
 void CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
@@ -43,19 +46,61 @@ void CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
 // parse input as a constructible number, if positive set the result to num, starting from index, skipping any leading or ending whitespace
 void CLIProgram::parse_num(constr_num *num, std::istream &str)
 {
+    const string bin_ops = "+-*/";
     stack<constr_num> output;
-    stack<string> operators;
+    stack<char> operators;
+    int n;
 
     // read until empty
-    while (stream.rdbuf()->in_avail()) {
+    while (str.rdbuf()->in_avail()) {
         // if reading number, push number to output
-        // if reading unary operator, push to operators
-        // if reading binary operator, apply each binary operator in operators to output until the topmost operator has less precedence,
-        //  or until the topmost operator is unary, and then push the operator to the stack
-        // if reading left parenthesis, pop and apply operator in operators until there is a right parenthesis,
-        //  return if the stack is emptied before a right parenthesis, pop right parenthesis,
-        //  if topmost operator is unary pop and apply it to output
-        // if reading right parenthesis, push to operators
+        str >> n;
+        if (str.good()) {
+            output.push(n);
+            continue;
+        }
+        str.clear();
+
+        switch (str.peek()) {
+        case 's': // for now, take sqrt to be written as 's'
+        case ')':
+            // if reading unary operator or right parenthesis, push to operators
+            operators.push(str.get());
+            break;
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+            // if reading binary operator, apply each binary operator in operators to output until the topmost operator has less precedence,
+            //  or until the topmost operator is unary, and then push the operator to the stack
+            for (char op = operators.top(); !operators.empty() && bin_ops.find(op) >= bin_ops.find(str.peek()); op = operators.top()) {
+                // apply op to output
+                apply(op, output);
+                operators.pop();
+            }
+            operators.push(str.get());
+            break;
+        case '(':
+            // if reading left parenthesis, pop and apply operator in operators until there is a right parenthesis,
+            //  return if the stack is emptied before a right parenthesis, pop right parenthesis,
+            //  if topmost operator is unary pop and apply it to output
+            for (char op = operators.top(); !operators.empty() && op != ')'; op = operators.top()) {
+                // apply op to output
+                apply(op, output);
+                operators.pop();
+            }
+            if (operators.empty())
+                return;
+            operators.pop();
+            if (!operators.empty() && operators.top() == 's') {
+                // apply operators.top() to output
+                apply(operators.top(), output);
+                operators.pop();
+            }
+        }
+
+        // skip whitespace
+        str >> std::ws;
     }
 
     while (!operators.empty()) {
@@ -65,8 +110,27 @@ void CLIProgram::parse_num(constr_num *num, std::istream &str)
     }
 
     if (!output.empty())
-        *num = output.pop();
+        *num = output.top();
 }
+
+#define OP_CASE(op, ch) case ch: arg1 = output.top(); output.pop(); output.top() = output.top() op arg1; break;
+
+void CLIProgram::apply(int op, stack<constr_num> &output)
+{
+    constr_num arg1;
+
+    switch (op) {
+    case 's':
+        output.top() = sqrt(output.top());
+        break;
+    OP_CASE(+, '+');
+    OP_CASE(-, '-');
+    OP_CASE(*, '*');
+    OP_CASE(/, '/');
+    }
+}
+
+#undef OP_CASE
 
 // perhaps make these communicate with input() and wait until every name is assigned before printing
 
