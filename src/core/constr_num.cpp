@@ -148,6 +148,7 @@ ostream &operator<<(ostream &s, const constr_num &a)
     return s;
 }
 
+// TODO perhaps make this just print the value if the expression tree is too large
 void constr_num::print(ostream &s, Expr *expr, bool parenthesize) const
 {
     if (expr->type == Expr::constant) {

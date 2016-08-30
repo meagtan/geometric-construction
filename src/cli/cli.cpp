@@ -104,6 +104,7 @@ SHAPE_CONSTR(struct Circle, Circle, c)
 SHAPE_CONSTR(LineSegment, Segment, s)
 SHAPE_CONSTR(struct Angle, Angle, a)
 Shape::Shape(constr_num n) : type(Number), u((const struct Point *) nullptr), n(n) {}
+Shape::Shape() : Shape((const struct Point *) nullptr) {}
 
 #undef MEMBER_CONSTR
 #undef SHAPE_CONSTR

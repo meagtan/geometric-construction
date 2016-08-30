@@ -51,6 +51,7 @@ struct Shape {
     } u;
     constr_num n;
 
+    Shape();
     Shape(const struct Point  *);
     Shape(const struct Line   *);
     Shape(const struct Circle *);
@@ -163,7 +164,7 @@ struct Command {
                                                    p.print(*shapes[0].u._arg); })}
 
 const unordered_multimap<string,Command> commands ({
-    {"quit", Command({}, +[](CLIProgram &p, Calculator &c, Shape shapes[]){p.quit();})},
+    {"quit", Command({}, +[](CLIProgram &p, Calculator &, Shape[]){p.quit();})},
     PRINT_COMM(Point, p),
     PRINT_COMM(Line, l),
     PRINT_COMM(Circle, c),

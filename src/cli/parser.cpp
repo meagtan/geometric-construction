@@ -44,6 +44,7 @@ void CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
 }
 
 // parse input as a constructible number, if positive set the result to num, starting from index, skipping any leading or ending whitespace
+// TODO distinguish - as a unary operator from - as a binary operator
 void CLIProgram::parse_num(constr_num *num, std::istream &str)
 {
     const string bin_ops = "+-*/";
@@ -97,6 +98,9 @@ void CLIProgram::parse_num(constr_num *num, std::istream &str)
                 apply(operators.top(), output);
                 operators.pop();
             }
+            str.get();
+        default:
+            str.get();
         }
 
         // skip whitespace
@@ -164,38 +168,40 @@ void CLIProgram::meet(const Line *l1, const Line *l2, const Point *p)
     cout << name << " = meet " << d.get_name(l1) << "; " << d.get_name(l2) << endl;
 }
 
-// TODO called from command, distinguished from the shapes added using the moves above
 void CLIProgram::add(Shape shape)
 {
-
+    cout << "Added " << d.get_name(shape) << endl;
 }
 
 void CLIProgram::print(const Point &p)
 {
-
+    cout << "The point (" << p.x << "," << p.y << ")" << endl;
 }
 
 void CLIProgram::print(const Line &l)
 {
-
+    cout << "The line " << l.x_coeff << " x + " << l.y_coeff << " y + " << l.const_coeff << " = 0" << endl;
 }
 
 void CLIProgram::print(const Circle &c)
 {
-
+    cout << "The circle with center (" << c.center.x << "," << c.center.y << ") and radius " << c.radius << endl;
 }
 
 void CLIProgram::print(const LineSegment &s)
 {
-
+    cout << "The line segment between points (" << s.start.x << "," << s.start.y << ") and (" << s.end.x << "," << s.end.y << ")" << endl;
 }
 
 void CLIProgram::print(const Angle &a)
 {
+    cout << "The angle between lines \n\t" <<
+            a.l1.x_coeff << " x + " << a.l1.y_coeff << " y + " << a.l1.const_coeff << " = 0 and \n\t" <<
+            a.l1.x_coeff << " x + " << a.l1.y_coeff << " y + " << a.l1.const_coeff << " = 0" << endl;
 
 }
 
 void CLIProgram::print(constr_num n)
 {
-
+    cout << "The constructible number " << n << endl;
 }
