@@ -26,14 +26,14 @@ bool CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
         // if type is Point, try to parse (num, num)
 
         // first search for ( , )
-        if (input[pos] != '(' || input[end] != ')')
+        if (input[pos] != '(' || input[end - 1] != ')')
             return false;
         for (comm = pos; comm < end && input[comm] != ','; ++comm);
         if (input[comm] != ',')
             return false;
 
         // parse arguments
-        if (!parse_num(&num, input, pos, comm) || !parse_num(&num1, input, comm + 1, end))
+        if (!parse_num(&num, input, pos+1, comm) || !parse_num(&num1, input, comm+1, end-1))
             return false;
 
         // check if point is constructed
@@ -102,11 +102,13 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
             if (operators.empty())
                 return false;
             operators.pop();
+
             if (!operators.empty() && operators.top() == 's') {
                 // apply operators.top() to output
                 apply(operators.top(), output);
                 operators.pop();
             }
+            break;
         default: // wrong character
             return false;
         }

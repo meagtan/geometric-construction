@@ -112,6 +112,7 @@ public:
     void input(string query);
     void add(Shape);
     void quit();
+    void help();
     bool is_running();
 
     void print(const Point &);
@@ -165,7 +166,8 @@ struct Command {
                                                    p.print(*shapes[0].u._arg); })}
 
 const unordered_multimap<string,Command> commands ({
-    {"quit", Command({}, +[](CLIProgram &p, Calculator &, Shape[]){p.quit();})},
+    {"help", Command({}, +[](CLIProgram &p, Calculator &, Shape[]) {p.help();})},
+    {"quit", Command({}, +[](CLIProgram &p, Calculator &, Shape[]) {p.quit();})},
     PRINT_COMM(Point, p),
     PRINT_COMM(Line, l),
     PRINT_COMM(Circle, c),

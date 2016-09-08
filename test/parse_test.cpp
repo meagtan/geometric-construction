@@ -14,5 +14,6 @@ void parse_test()
             cout << num << endl;
         else
             cout << "Invalid input." << endl;
+        s = "";
     }
 }

@@ -4,14 +4,14 @@
 
 // CLIProgram
 
-CLIProgram::CLIProgram() : c(this) {}
+CLIProgram::CLIProgram() : c(this)
+{
+    cout << "Type help to see available commands.\n";
+}
 
 CLIProgram::~CLIProgram() {}
 
-// TODO
-// - Need a command to describe a shape given its name
-// - input() must output all the operations done through the MoveListener functions and the result through add()
-
+// TODO add assignment
 void CLIProgram::input(string query)
 {
     size_t start, comm_end;
@@ -81,6 +81,17 @@ void CLIProgram::input(string query)
 
 void CLIProgram::quit() { running = false; }
 bool CLIProgram::is_running() { return running; }
+
+void CLIProgram::help()
+{
+    printf("  The list of available commands are:\n%-15sArguments\n", "Command");
+    for (auto &pair : commands) {
+        printf("    %-15s", pair.first.c_str());
+        for (auto type : pair.second.args)
+            cout << types[type] << '\t';
+        cout << endl;
+    }
+}
 
 // Shape
 

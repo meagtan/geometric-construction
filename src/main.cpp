@@ -16,12 +16,12 @@ int main(int argc, char *argv[])
 
     return a.exec();
     */
-    TEST(parse);
+    // TEST(parse);
 
     // TODO make a small interpreter that allows the user to create objects (either assigned to variables or given default names)
     // and connect them through commands
 
-    /*
+    ///*
     CLIProgram p;
     string s;
 
@@ -32,5 +32,5 @@ int main(int argc, char *argv[])
 
         p.input(s);
     }
-    */
+    //*/
 }
