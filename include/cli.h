@@ -101,8 +101,8 @@ class CLIProgram : protected MoveListener {
     void meet(const Line*, const Circle*, const Point*);
     void meet(const Line*, const Line*, const Point*);
 
-    void parse_arg(Shape *shape, string input, Shape::Type type);
-    void parse_num(constr_num *num, std::istream &str);
+    bool parse_arg(Shape *shape, string input, Shape::Type type);
+    bool parse_num(constr_num *num, string input, int pos, int end);
     void apply(int op, stack<constr_num> &output);
 public:
     CLIProgram();

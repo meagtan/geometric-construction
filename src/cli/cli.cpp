@@ -16,7 +16,7 @@ void CLIProgram::input(string query)
 {
     size_t start, comm_end;
     vector<Shape> args;
-    Shape *arg = nullptr;
+    Shape arg;
     bool found;
 
     // skip leading whitespace and find command
@@ -45,16 +45,14 @@ void CLIProgram::input(string query)
 
         // try to parse each argument based on its type
         for (int i = 0, pos = comm_end; i != comm.args.size(); ++i) {
-            // parse argument
-            parse_arg(arg, query.substr(pos, query.find(delim, pos)), comm.args[i]);
 
             // if argument cannot be parsed, skip to next command
-            if (arg == nullptr) {
+            if (!parse_arg(&arg, query.substr(pos, query.find(delim, pos)), comm.args[i])) {
                 found = false;
                 break;
             }
 
-            args.push_back(*arg);
+            args.push_back(arg);
 
             // move to after next delim and skip whitespace
             for (; comm_end != query.length() && query[comm_end] != delim; ++comm_end);
@@ -70,7 +68,7 @@ void CLIProgram::input(string query)
 
     // no matching command found, alert user
     cout << "Error: invalid set of arguments for command " << comm_range.first->first << "." << endl;
-    cout << "The valid lists of arguments for " << comm_range.first->first << "are:" << endl;
+    cout << "The valid lists of arguments for " << comm_range.first->first << " are:" << endl;
     for (auto pair = comm_range.first; pair != comm_range.second; ++pair) {
         cout << '\t';
         for (auto arg = pair->second.args.begin(); arg != pair->second.args.end(); ++arg) {
@@ -152,7 +150,13 @@ bool Shape::operator==(const Shape &other) const
 
 // Dictionary
 
-Dictionary::Dictionary() {}
+Dictionary::Dictionary()
+{
+    add("origin", origin);
+    add("x_axis", x_axis);
+    add("y_axis", y_axis);
+}
+
 Dictionary::~Dictionary() {}
 
 Shape *Dictionary::get_shape(string name)

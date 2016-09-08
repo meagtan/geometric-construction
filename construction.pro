@@ -22,7 +22,8 @@ SOURCES += \
     src/core/constr_num_ops.cpp \
     src/core/calculator.cpp \
     src/cli/parser.cpp \
-    src/cli/cli.cpp
+    src/cli/cli.cpp \
+    test/parse_test.cpp
 
 HEADERS += \
     include/core.h \

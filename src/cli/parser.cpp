@@ -5,68 +5,73 @@ using std::endl;
 
 // CLIProgram
 
-void CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
+bool CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
 {
     Shape *res;
-    constr_num *num = nullptr, *num1 = nullptr;
+    constr_num num, num1;
     istringstream stream(input);
     string name;
+    int pos = 0, comm, end = input.length();
 
     stream >> name;
     res = d.get_shape(name);
-    stream.str(input);
     if (res != nullptr && res->type == type) {
         *shape = *res;
     } else if (type == Shape::Number) {
         // if type is Number, try to parse num
-        parse_num(num, stream);
-        if (num != nullptr && !stream.rdbuf()->in_avail())
-            *shape = Shape(*num);
+        if (parse_num(&num, input, pos, end))
+            *shape = Shape(num);
+        else
+            return false;
     } else if (type == Shape::Point) {
         // if type is Point, try to parse (num, num)
 
-        if (stream.get() != '(') return;
+        // first search for ( , )
+        if (input[pos] != '(' || input[end] != ')')
+            return false;
+        for (comm = pos; comm < end && input[comm] != ')' && input[comm] != ','; ++comm);
+        if (input[comm] != ',')
+            return false;
 
-        // parse first argument
-        parse_num(num, stream);
-        if (num == nullptr || stream.get() != ',') return;
-
-        // parse second argument
-        parse_num(num1, stream);
-        if (num1 == nullptr || stream.get() != ')') return;
+        // parse arguments
+        if (!parse_num(&num, input, pos, comm) || !parse_num(&num1, input, comm + 1, end))
+            return false;
 
         // check if point is constructed
-        auto p = c.get_point(*num, *num1);
+        auto p = c.get_point(num, num1);
         if (p != nullptr)
             *shape = Shape(p);
-
+        else
+            return false;
     }
+
+    return true;
 }
 
 // parse input as a constructible number, if positive set the result to num, starting from index, skipping any leading or ending whitespace
 // TODO distinguish - as a unary operator from - as a binary operator
-void CLIProgram::parse_num(constr_num *num, std::istream &str)
+bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
 {
     const string bin_ops = "+-*/";
     stack<constr_num> output;
     stack<char> operators;
     int n;
+    char c;
 
     // read until empty
-    while (str.rdbuf()->in_avail()) {
+    while (pos < end) {
         // if reading number, push number to output
-        str >> n;
-        if (str.good()) {
+        if (isdigit(str[pos])) {
+            for (n = 0; pos < end && isdigit(str[pos]); n = n * 10 + str[pos] - '0', ++pos);
             output.push(n);
             continue;
         }
-        str.clear();
 
-        switch (str.peek()) {
+        switch (c = str[pos]) {
         case 's': // for now, take sqrt to be written as 's'
         case ')':
             // if reading unary operator or right parenthesis, push to operators
-            operators.push(str.get());
+            operators.push(c);
             break;
         case '+':
         case '-':
@@ -74,12 +79,12 @@ void CLIProgram::parse_num(constr_num *num, std::istream &str)
         case '/':
             // if reading binary operator, apply each binary operator in operators to output until the topmost operator has less precedence,
             //  or until the topmost operator is unary, and then push the operator to the stack
-            for (char op = operators.top(); !operators.empty() && bin_ops.find(op) >= bin_ops.find(str.peek()); op = operators.top()) {
+            for (char op = operators.top(); !operators.empty() && bin_ops.find(op) >= bin_ops.find(c); op = operators.top()) {
                 // apply op to output
                 apply(op, output);
                 operators.pop();
             }
-            operators.push(str.get());
+            operators.push(c);
             break;
         case '(':
             // if reading left parenthesis, pop and apply operator in operators until there is a right parenthesis,
@@ -91,30 +96,35 @@ void CLIProgram::parse_num(constr_num *num, std::istream &str)
                 operators.pop();
             }
             if (operators.empty())
-                return;
+                return false;
             operators.pop();
             if (!operators.empty() && operators.top() == 's') {
                 // apply operators.top() to output
                 apply(operators.top(), output);
                 operators.pop();
             }
-            str.get();
-        default:
-            str.get();
         }
 
+
         // skip whitespace
-        str >> std::ws;
+        for (; pos < end && isspace(str[pos]); ++pos);
     }
 
     while (!operators.empty()) {
         // pop operator from operators
-        // if right parenthesis, return
+        c = operators.top();
+        operators.pop();
+
+        // if right parenthesis, invalid expression
+        if (c == ')') return false;
+
         // else apply operator to output
+        apply(c, output);
     }
 
     if (!output.empty())
         *num = output.top();
+    return true;
 }
 
 #define OP_CASE(op, ch) case ch: arg1 = output.top(); output.pop(); output.top() = output.top() op arg1; break;
