@@ -44,9 +44,13 @@ void CLIProgram::input(string query)
             continue;
 
         // try to parse each argument based on its type
-        for (int i = 0, pos = comm_end; i < comm.args.size(); ++i) {
+        for (int i = 0, pos = comm_end, del = 0; i < comm.args.size(); ++i) {
+            // find next delimiter or end of line
+            for (del = 0; pos + del != query.length() && query[pos + del] != delim; ++del);
+
+            cout << "\"" << query << "\"[" << pos << ":" << pos + del << "] vs. " << comm.args[i] << endl;
             // if argument cannot be parsed, skip to next command
-            if (!parse_arg(&arg, query.substr(pos, query.find(delim, pos)), comm.args[i])) {
+            if (!parse_arg(&arg, query.substr(pos, del), comm.args[i])) {
                 found = false;
                 break;
             }
@@ -54,7 +58,7 @@ void CLIProgram::input(string query)
             args.push_back(arg);
 
             // move to after next delim and skip whitespace
-            for (; pos != query.length() && query[pos] != delim; ++pos);
+            pos += del + 1;
             for (; pos != query.length() && isspace(query[pos]); ++pos);
         }
 
@@ -84,11 +88,11 @@ bool CLIProgram::is_running() { return running; }
 
 void CLIProgram::help()
 {
-    printf("  The list of available commands are:\n%-15sArguments\n", "Command");
+    printf("  The list of available commands are:\n\t%-15sArguments\n", "Command");
     for (auto &pair : commands) {
-        printf("    %-15s", pair.first.c_str());
+        printf("\t%-15s", pair.first.c_str());
         for (auto type : pair.second.args)
-            cout << types[type] << '\t';
+            printf("%-10s", types[type].c_str());
         cout << endl;
     }
 }
@@ -121,7 +125,7 @@ Shape::~Shape() {}
 
 #define TYPE_CASE(_type, _arg) case _type: u._arg = other.u._arg; n = 0; break
 
-Shape::Shape(const Shape &other) : type(other.type), u(other.u)
+Shape::Shape(const Shape &other) : type(other.type), u(other.u), name(other.name)
 {
     switch (other.type) {
         TYPE_CASE(Point, p);
@@ -149,6 +153,7 @@ Shape &Shape::operator=(const Shape &other)
             n = other.n;
         }
         type = other.type;
+        name = other.name;
     }
 
     return *this;

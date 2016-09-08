@@ -190,6 +190,7 @@ void CLIProgram::meet(const Line *l1, const Line *l2, const Point *p)
 void CLIProgram::add(Shape shape)
 {
     cout << "Added " << d.get_name(shape) << endl;
+    // TODO perhaps call print after this
 }
 
 void CLIProgram::print(const Point &p)
