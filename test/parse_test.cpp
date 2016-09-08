@@ -6,14 +6,13 @@ void parse_test()
     CLIProgram p;
     string s;
     constr_num num;
-    int pos = 0;
 
-    /*
-    {
-        if (p.parse_num(&num, "1", pos, 1))
+    while (true) {
+        cout << "> ";
+        getline(cin, s);
+        if (p.parse_num(&num, s, 0, s.length()))
             cout << num << endl;
         else
             cout << "Invalid input." << endl;
     }
-    */
 }

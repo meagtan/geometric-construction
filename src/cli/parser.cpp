@@ -17,19 +17,18 @@ bool CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
     res = d.get_shape(name);
     if (res != nullptr && res->type == type) {
         *shape = *res;
-    } else if (type == Shape::Number) {
+        return true;
+    } else if (type == Shape::Number && parse_num(&num, input, pos, end)) {
         // if type is Number, try to parse num
-        if (parse_num(&num, input, pos, end))
-            *shape = Shape(num);
-        else
-            return false;
+        *shape = Shape(num);
+        return true;
     } else if (type == Shape::Point) {
         // if type is Point, try to parse (num, num)
 
         // first search for ( , )
         if (input[pos] != '(' || input[end] != ')')
             return false;
-        for (comm = pos; comm < end && input[comm] != ')' && input[comm] != ','; ++comm);
+        for (comm = pos; comm < end && input[comm] != ','; ++comm);
         if (input[comm] != ',')
             return false;
 
@@ -39,13 +38,13 @@ bool CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
 
         // check if point is constructed
         auto p = c.get_point(num, num1);
-        if (p != nullptr)
+        if (p != nullptr) {
             *shape = Shape(p);
-        else
-            return false;
+            return true;
+        }
     }
 
-    return true;
+    return false;
 }
 
 // parse input as a constructible number, if positive set the result to num, starting from index, skipping any leading or ending whitespace
@@ -56,10 +55,13 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
     stack<constr_num> output;
     stack<char> operators;
     int n;
-    char c;
+    char c, op;
 
     // read until empty
     while (pos < end) {
+        // skip whitespace
+        for (; pos < end && isspace(str[pos]); ++pos);
+
         // if reading number, push number to output
         if (isdigit(str[pos])) {
             for (n = 0; pos < end && isdigit(str[pos]); n = n * 10 + str[pos] - '0', ++pos);
@@ -67,10 +69,10 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
             continue;
         }
 
-        switch (c = str[pos]) {
+        switch (c = str[pos++]) {
         case 's': // for now, take sqrt to be written as 's'
-        case ')':
-            // if reading unary operator or right parenthesis, push to operators
+        case '(':
+            // if reading unary operator or left parenthesis, push to operators
             operators.push(c);
             break;
         case '+':
@@ -79,20 +81,22 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
         case '/':
             // if reading binary operator, apply each binary operator in operators to output until the topmost operator has less precedence,
             //  or until the topmost operator is unary, and then push the operator to the stack
-            for (char op = operators.top(); !operators.empty() && bin_ops.find(op) >= bin_ops.find(c); op = operators.top()) {
+            while (!operators.empty() && bin_ops.find(op = operators.top()) >= bin_ops.find(c) && op != '(') {
                 // apply op to output
-                apply(op, output);
+                if (!apply(op, output))
+                    return false;
                 operators.pop();
             }
             operators.push(c);
             break;
-        case '(':
-            // if reading left parenthesis, pop and apply operator in operators until there is a right parenthesis,
-            //  return if the stack is emptied before a right parenthesis, pop right parenthesis,
+        case ')':
+            // if reading right parenthesis, pop and apply operator in operators until there is a left parenthesis,
+            //  return if the stack is emptied before a left parenthesis, pop left parenthesis,
             //  if topmost operator is unary pop and apply it to output
-            for (char op = operators.top(); !operators.empty() && op != ')'; op = operators.top()) {
+            while (!operators.empty() && (op = operators.top()) != '(') {
                 // apply op to output
-                apply(op, output);
+                if (!apply(op, output))
+                    return false;
                 operators.pop();
             }
             if (operators.empty())
@@ -103,11 +107,9 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
                 apply(operators.top(), output);
                 operators.pop();
             }
+        default: // wrong character
+            return false;
         }
-
-
-        // skip whitespace
-        for (; pos < end && isspace(str[pos]); ++pos);
     }
 
     while (!operators.empty()) {
@@ -115,8 +117,8 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
         c = operators.top();
         operators.pop();
 
-        // if right parenthesis, invalid expression
-        if (c == ')') return false;
+        // if left parenthesis, invalid expression
+        if (c == '(') return false;
 
         // else apply operator to output
         apply(c, output);
@@ -127,11 +129,14 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
     return true;
 }
 
-#define OP_CASE(op, ch) case ch: arg1 = output.top(); output.pop(); output.top() = output.top() op arg1; break;
+#define OP_CASE(op, ch) case ch: arg1 = output.top(); output.pop(); if (output.empty()) return false; output.top() = output.top() op arg1; break;
 
-void CLIProgram::apply(int op, stack<constr_num> &output)
+bool CLIProgram::apply(int op, stack<constr_num> &output)
 {
     constr_num arg1;
+
+    if (output.empty())
+        return false;
 
     switch (op) {
     case 's':
@@ -142,6 +147,8 @@ void CLIProgram::apply(int op, stack<constr_num> &output)
     OP_CASE(*, '*');
     OP_CASE(/, '/');
     }
+
+    return true;
 }
 
 #undef OP_CASE

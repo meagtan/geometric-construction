@@ -28,7 +28,7 @@ using std::unordered_multimap;
 // all this for what would amount to a simple apply call in lisp
 
 struct Shape {
-    const enum Type {
+    enum Type {
         Point,
         Line,
         Circle,
@@ -101,9 +101,10 @@ class CLIProgram : protected MoveListener {
     void meet(const Line*, const Circle*, const Point*);
     void meet(const Line*, const Line*, const Point*);
 
+public: // TODO remove this after testing
     bool parse_arg(Shape *shape, string input, Shape::Type type);
     bool parse_num(constr_num *num, string input, int pos, int end);
-    void apply(int op, stack<constr_num> &output);
+    bool apply(int op, stack<constr_num> &output);
 public:
     CLIProgram();
     ~CLIProgram();
