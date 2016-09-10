@@ -6,7 +6,7 @@
 
 CLIProgram::CLIProgram() : c(this)
 {
-    cout << "Type help to see available commands.\n";
+    cout << "The valid format for inputs is:\n    <command> [<arg>{; <arg>}]\nType help to see available commands.\n";
 }
 
 CLIProgram::~CLIProgram() {}
@@ -48,7 +48,6 @@ void CLIProgram::input(string query)
             // find next delimiter or end of line
             for (del = 0; pos + del != query.length() && query[pos + del] != delim; ++del);
 
-            cout << "\"" << query << "\"[" << pos << ":" << pos + del << "] vs. " << comm.args[i] << endl;
             // if argument cannot be parsed, skip to next command
             if (!parse_arg(&arg, query.substr(pos, del), comm.args[i])) {
                 found = false;
@@ -73,7 +72,7 @@ void CLIProgram::input(string query)
     cout << "Error: invalid set of arguments for command " << comm_range.first->first << "." << endl;
     cout << "The valid lists of arguments for " << comm_range.first->first << " are:" << endl;
     for (auto pair = comm_range.first; pair != comm_range.second; ++pair) {
-        cout << '\t';
+        cout << "    ";
         for (auto arg = pair->second.args.begin(); arg != pair->second.args.end(); ++arg) {
             cout << types[*arg];
             if (arg != pair->second.args.end() - 1)
@@ -88,9 +87,9 @@ bool CLIProgram::is_running() { return running; }
 
 void CLIProgram::help()
 {
-    printf("  The list of available commands are:\n\t%-15sArguments\n", "Command");
+    printf("  The list of available commands are:\n    %-15sArguments\n", "Command");
     for (auto &pair : commands) {
-        printf("\t%-15s", pair.first.c_str());
+        printf("    %-15s", pair.first.c_str());
         for (auto type : pair.second.args)
             printf("%-10s", types[type].c_str());
         cout << endl;
@@ -125,7 +124,7 @@ Shape::~Shape() {}
 
 #define TYPE_CASE(_type, _arg) case _type: u._arg = other.u._arg; n = 0; break
 
-Shape::Shape(const Shape &other) : type(other.type), u(other.u), name(other.name)
+Shape::Shape(const Shape &other) : type(other.type), u(other.u)
 {
     switch (other.type) {
         TYPE_CASE(Point, p);
@@ -153,7 +152,6 @@ Shape &Shape::operator=(const Shape &other)
             n = other.n;
         }
         type = other.type;
-        name = other.name;
     }
 
     return *this;
@@ -197,24 +195,28 @@ Shape *Dictionary::get_shape(string name)
 
 string Dictionary::get_name(Shape shape)
 {
-    return shape.name;
+    auto iter = std::find_if(shapes.begin(), shapes.end(), [shape](const pair<string,Shape> &p){return p.second == shape;});
+    if (iter != shapes.end())
+        return iter->first;
+    return "";
 }
 
 string Dictionary::add(Shape shape)
 {
-    // should also include when shape.name == ""
-    if (shapes.find(shape.name) == shapes.end()) {
-        shape.name = generate_name(shape.type);
-        shapes.emplace(std::make_pair(shape.name, shape));
+    string name = get_name(shape);
+    if (name == "") {
+        name = generate_name(shape.type);
+        shapes.emplace(std::make_pair(name, shape));
     }
-    return shape.name;
+    return name;
 }
 
 string Dictionary::add(string name, Shape shape)
 {
-    if (shapes.find(shape.name) != shapes.end())
-        shapes.erase(shape.name);
-    shape.name = name;
+    string oldname = get_name(shape);
+    if (oldname != "")
+        shapes.erase(oldname);
+
     shapes.emplace(std::make_pair(name, shape));
     return name;
 }

@@ -23,6 +23,7 @@ using std::map;
 using std::pair;
 using std::stack;
 using std::string;
+using std::unordered_map;
 using std::unordered_multimap;
 
 // all this for what would amount to a simple apply call in lisp
@@ -63,10 +64,6 @@ struct Shape {
 
     Shape &operator=(const Shape &);
     bool operator==(const Shape &) const;
-
-private:
-    string name = "";
-    friend struct Dictionary;
 };
 
 struct Dictionary {
