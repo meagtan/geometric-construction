@@ -59,7 +59,10 @@ bool Line::precedes(const Point &a, const Point &b) const
 bool Line::operator==(const Line &other) const
 {
     return x_coeff * other.const_coeff == const_coeff * other.x_coeff &&
-           y_coeff * other.const_coeff == const_coeff * other.y_coeff;
+           y_coeff * other.const_coeff == const_coeff * other.y_coeff &&
+           (x_coeff == 0) == (other.x_coeff == 0) && // quick hack to account for zeroes
+           (y_coeff == 0) == (other.y_coeff == 0) &&
+           (const_coeff == 0) == (other.const_coeff == 0);
 }
 
 bool Line::operator!=(const Line &other) const

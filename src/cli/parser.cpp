@@ -197,27 +197,27 @@ void CLIProgram::add(Shape shape)
 
 void CLIProgram::print(const Point &p)
 {
-    cout << "The point (" << p.x << "," << p.y << ")" << endl;
+    cout << d.get_name(&p) << " = The point (" << p.x << "," << p.y << ")" << endl;
 }
 
 void CLIProgram::print(const Line &l)
 {
-    cout << "The line " << l.x_coeff << " x + " << l.y_coeff << " y + " << l.const_coeff << " = 0" << endl;
+    cout << d.get_name(&l) << " = The line " << l.x_coeff << " x + " << l.y_coeff << " y + " << l.const_coeff << " = 0" << endl;
 }
 
 void CLIProgram::print(const Circle &c)
 {
-    cout << "The circle with center (" << c.center.x << "," << c.center.y << ") and radius " << c.radius << endl;
+    cout << d.get_name(&c) << " = The circle with center (" << c.center.x << "," << c.center.y << ") and radius " << c.radius << endl;
 }
 
 void CLIProgram::print(const LineSegment &s)
 {
-    cout << "The line segment between points (" << s.start.x << "," << s.start.y << ") and (" << s.end.x << "," << s.end.y << ")" << endl;
+    cout << d.get_name(&s) << " = The line segment between points (" << s.start.x << "," << s.start.y << ") and (" << s.end.x << "," << s.end.y << ")" << endl;
 }
 
 void CLIProgram::print(const Angle &a)
 {
-    cout << "The angle between lines \n\t" <<
+    cout << d.get_name(&a) << " = The angle between lines \n\t" <<
             a.l1.x_coeff << " x + " << a.l1.y_coeff << " y + " << a.l1.const_coeff << " = 0 and \n\t" <<
             a.l1.x_coeff << " x + " << a.l1.y_coeff << " y + " << a.l1.const_coeff << " = 0" << endl;
 
@@ -225,5 +225,5 @@ void CLIProgram::print(const Angle &a)
 
 void CLIProgram::print(constr_num n)
 {
-    cout << "The constructible number " << n << endl;
+    cout << d.get_name(n) << " = The constructible number " << n << endl;
 }
