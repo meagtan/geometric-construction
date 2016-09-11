@@ -159,16 +159,16 @@ Shape &Shape::operator=(const Shape &other)
 
 #undef TYPE_CASE
 
-#define TYPE_COND(_type, _arg) (type == _type && _arg == other._arg)
+#define TYPE_COND(_type, _arg, ...) (type == _type && __VA_ARGS__ _arg == __VA_ARGS__ (other._arg))
 
 bool Shape::operator==(const Shape &other) const
 {
     return type == other.type &&
-           (TYPE_COND(Point, u.p)   ||
-            TYPE_COND(Line, u.l)    ||
-            TYPE_COND(Circle, u.c)  ||
-            TYPE_COND(Segment, u.s) ||
-            TYPE_COND(Angle, u.a)   ||
+           (TYPE_COND(Point, u.p, *)   ||
+            TYPE_COND(Line, u.l, *)    ||
+            TYPE_COND(Circle, u.c, *)  ||
+            TYPE_COND(Segment, u.s, *) ||
+            TYPE_COND(Angle, u.a, *)   ||
             TYPE_COND(Number, n));
 }
 

@@ -92,7 +92,7 @@ class CLIProgram : protected MoveListener {
 
     bool running = true;
 
-    void straightedge(const Point*, const Point*, const Line*);
+    void straightedge(const Point*, const Point*, const Line*); // TODO distinguish line segments
     void compass(const Point*, const Point*, const Circle*);
     void meet(const Circle*, const Circle*, const Point*);
     void meet(const Line*, const Circle*, const Point*);

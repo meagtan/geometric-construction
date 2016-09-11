@@ -80,7 +80,7 @@ protected:
 };
 
 struct MoveListener {
-    virtual void straightedge(const Point*, const Point*, const Line*) = 0;
+    virtual void straightedge(const Point*, const Point*, const Line*) = 0; // TODO distinguish line segments
     virtual void compass(const Point*, const Point*, const Circle*) = 0;
     virtual void meet(const Circle*, const Circle*, const Point*) = 0;
     virtual void meet(const Line*, const Circle*, const Point*) = 0;

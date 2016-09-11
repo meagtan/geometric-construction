@@ -13,7 +13,7 @@ Constructor::~Constructor()
 bool Constructor::contains(const Angle *a) const
 {
     return a != nullptr &&
-           std::count_if(angles.begin(), angles.end(), [a](const Angle *p) {return *p == *a; });
+           std::count_if(angles.begin(), angles.end(), [a](const Angle *p) {return *p == *a;});
 }
 
 void Constructor::add(const Angle *a)

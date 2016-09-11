@@ -21,6 +21,7 @@ bool CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
     } else if (type == Shape::Number && parse_num(&num, input, pos, end)) {
         // if type is Number, try to parse num
         *shape = Shape(num);
+        d.add(*shape);
         return true;
     } else if (type == Shape::Point) {
         // if type is Point, try to parse (num, num)
@@ -40,6 +41,7 @@ bool CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
         auto p = c.get_point(num, num1);
         if (p != nullptr) {
             *shape = Shape(p);
+            d.add(*shape);
             return true;
         }
     }

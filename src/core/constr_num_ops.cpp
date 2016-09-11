@@ -101,6 +101,7 @@ constr_num::Expr *constr_num::_sqrt(Expr *arg) const
     if (IS_INVERSION(arg))
         return mul(_sqrt(arg->expr_union.unary.arg),
                    invert(arg->expr_union.unary.arg));
+    // TODO check for square numbers and factors
 
     /*
     // if arg is a multiplication, distribute sqrt across its operands
