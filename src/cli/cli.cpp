@@ -11,77 +11,6 @@ CLIProgram::CLIProgram() : c(this)
 
 CLIProgram::~CLIProgram() {}
 
-// TODO add assignment
-void CLIProgram::input(string query)
-{
-    size_t start, comm_end;
-    vector<Shape> args;
-    Shape arg;
-    bool found;
-
-    // skip leading whitespace and find command
-    for (start = 0; start != query.length() && isspace(query[start]); ++start);
-    for (comm_end = start; comm_end != query.length() && !isspace(query[comm_end]); ++comm_end);
-
-    auto comm_range = commands.equal_range(query.substr(start, comm_end));
-    if (comm_range.first == commands.end()) { // TODO turn this into an exception
-        cout << "Invalid input: command not found." << endl;
-        return;
-    }
-
-    // skip whitespace
-    for (; comm_end != query.length() && isspace(query[comm_end]); ++comm_end);
-
-    // try each set of arguments viable for commands in comm_range
-    // TODO clean this up and convert skips into conditionals
-    for (auto pair = comm_range.first; pair != comm_range.second; ++pair) {
-        auto comm = pair->second;
-        args.clear();
-        found = true;
-
-        // skip for invalid number of arguments
-        if (std::count(query.begin() + comm_end, query.end(), delim) != PRED(comm.args.size()))
-            continue;
-
-        // try to parse each argument based on its type
-        for (int i = 0, pos = comm_end, del = 0; i < comm.args.size(); ++i) {
-            // find next delimiter or end of line
-            for (del = 0; pos + del != query.length() && query[pos + del] != delim; ++del);
-
-            // if argument cannot be parsed, skip to next command
-            if (!parse_arg(&arg, query.substr(pos, del), comm.args[i])) {
-                found = false;
-                break;
-            }
-
-            args.push_back(arg);
-
-            // move to after next delim and skip whitespace
-            pos += del + 1;
-            for (; pos != query.length() && isspace(query[pos]); ++pos);
-        }
-
-        // apply args to command and exit
-        if (found) {
-            (*comm.fun)(*this, c, args.data());
-            return;
-        }
-    }
-
-    // no matching command found, alert user
-    cout << "Error: invalid set of arguments for command " << comm_range.first->first << "." << endl;
-    cout << "The valid lists of arguments for " << comm_range.first->first << " are:" << endl;
-    for (auto pair = comm_range.first; pair != comm_range.second; ++pair) {
-        cout << "    ";
-        for (auto arg = pair->second.args.begin(); arg != pair->second.args.end(); ++arg) {
-            cout << types[*arg];
-            if (arg != pair->second.args.end() - 1)
-                cout << "; ";
-        }
-        cout << endl;
-    }
-}
-
 void CLIProgram::quit() { running = false; }
 bool CLIProgram::is_running() { return running; }
 
@@ -94,6 +23,77 @@ void CLIProgram::help()
             printf("%-10s", types[type].c_str());
         cout << endl;
     }
+}
+
+// perhaps make these communicate with input() and wait until every name is assigned before printing
+
+void CLIProgram::straightedge(const Point *p1, const Point *p2, const Line *l)
+{
+    string name = d.add(l);
+    cout << name << " = straightedge " << d.get_name(p1) << "; " << d.get_name(p2) << endl;
+}
+
+void CLIProgram::compass(const Point *p1, const Point *p2, const Circle *c)
+{
+    string name = d.add(c);
+    cout << name << " = compass " << d.get_name(p1) << "; " << d.get_name(p2) << endl;
+}
+
+void CLIProgram::meet(const Circle *c1, const Circle *c2, const Point *p)
+{
+    string name = d.add(p);
+    cout << name << " = meet " << d.get_name(c1) << "; " << d.get_name(c2) << endl;
+}
+
+void CLIProgram::meet(const Line *l1, const Circle *c2, const Point *p)
+{
+    string name = d.add(p);
+    cout << name << " = meet " << d.get_name(l1) << "; " << d.get_name(c2) << endl;
+}
+
+void CLIProgram::meet(const Line *l1, const Line *l2, const Point *p)
+{
+    string name = d.add(p);
+    cout << name << " = meet " << d.get_name(l1) << "; " << d.get_name(l2) << endl;
+}
+
+void CLIProgram::add(Shape shape)
+{
+    cout << "Added " << d.get_name(shape) << endl;
+    // TODO perhaps call print after this
+}
+
+void CLIProgram::print(const Point &p)
+{
+    cout << d.get_name(&p) << " = The point (" << p.x << "," << p.y << ")" << endl;
+}
+
+void CLIProgram::print(const Line &l)
+{
+    cout << d.get_name(&l) << " = The line " << l.x_coeff << " x + " << l.y_coeff << " y + " << l.const_coeff << " = 0" << endl;
+}
+
+void CLIProgram::print(const Circle &c)
+{
+    cout << d.get_name(&c) << " = The circle with center (" << c.center.x << "," << c.center.y << ") and radius " << c.radius << endl;
+}
+
+void CLIProgram::print(const LineSegment &s)
+{
+    cout << d.get_name(&s) << " = The line segment between points (" << s.start.x << "," << s.start.y << ") and (" << s.end.x << "," << s.end.y << ")" << endl;
+}
+
+void CLIProgram::print(const Angle &a)
+{
+    cout << d.get_name(&a) << " = The angle between lines \n\t" <<
+            a.l1.x_coeff << " x + " << a.l1.y_coeff << " y + " << a.l1.const_coeff << " = 0 and \n\t" <<
+            a.l1.x_coeff << " x + " << a.l1.y_coeff << " y + " << a.l1.const_coeff << " = 0" << endl;
+
+}
+
+void CLIProgram::print(constr_num n)
+{
+    cout << d.get_name(n) << " = The constructible number " << n << endl;
 }
 
 // Shape
@@ -181,6 +181,8 @@ Dictionary::Dictionary()
     add("origin", origin);
     add("x_axis", x_axis);
     add("y_axis", y_axis);
+    add(unit_x);
+    add(unit_y);
 }
 
 Dictionary::~Dictionary() {}

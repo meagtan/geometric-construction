@@ -43,7 +43,7 @@ void Scope::add(const Circle *c)
         circles.push_back(c);
 }
 
-bool Scope::addPoint(const Point *a)
+bool Scope::add_point(const Point *a)
 {
     if (auto_construct_ints && a->x.is_int() && a->y.is_int()) {
         add(a);

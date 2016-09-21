@@ -70,7 +70,7 @@ void scope_test()
     Point *a = new Point(3, 4);
     Scope s(&lis);
 
-    s.addPoint(a);
+    s.add_point(a);
     auto *l = s.join_line(*a, *origin);
     if (l == nullptr) return;
     cout << s.contains(l) << " = 1\n";

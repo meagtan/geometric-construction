@@ -54,8 +54,8 @@ void constructor_test()
     Point *a = new Point(),
           *b = new Point(3),
           *c = new Point(3, 4);
-    s.addPoint(b);
-    s.addPoint(c);
+    s.add_point(b);
+    s.add_point(c);
     auto *l = s.join_segment(*a, *c);
     cout << l->contains(*c) << " and " << s.contains(c) << '\n';
     auto *l1 = s.perpendicular(*l, *b);

@@ -102,7 +102,7 @@ public:
     Scope(MoveListener *listener);
     virtual ~Scope();
 
-    bool addPoint(const Point *a); // for points with integer coordinates only
+    bool add_point(const Point *a); // for points with integer coordinates only
 
     bool contains(const Point *a) const;
     bool contains(const Line *l) const;

@@ -1,7 +1,7 @@
 #include "include/calculator.h"
 #include <assert.h>
 
-#define GET_POINT(n, on_y_axis) (on_y_axis) ? get_point(n) : get_point(0, n)
+#define GET_POINT(n, on_y_axis) ((on_y_axis) ? get_point(n) : get_point(0, n))
 
 Calculator::Calculator(MoveListener *lis) : Constructor(lis) {}
 
@@ -11,7 +11,7 @@ const Point *Calculator::get_point(constr_num x, constr_num y)
 {
     Point *p = new Point(x, y);
 
-    if (addPoint(p))
+    if (add_point(p)) // doesn't add to cli
         return p;
     delete p;
     return nullptr;
@@ -117,12 +117,14 @@ const Point *Calculator::get_sqrt(constr_num a, bool on_y_axis)
     return (on_y_axis ? meets.first->x : meets.first->y) < 0 ? meets.second : meets.first; // (0, √a)
 }
 
+// TODO check for subtraction and division for binary operations
 const Point *Calculator::construct_number(constr_num n, bool on_y_axis)
 {
     switch (n.expr->type) {
     case 0:
         return GET_POINT(n, on_y_axis);
     case 1:
+        construct_number(n.expr->expr_union.unary.arg);
         switch (n.expr->expr_union.unary.op) {
         case 1:
             return get_sub(0, n.expr->expr_union.unary.arg, on_y_axis);
@@ -132,6 +134,8 @@ const Point *Calculator::construct_number(constr_num n, bool on_y_axis)
             return get_sqrt(n.expr->expr_union.unary.arg, on_y_axis);
         }
     default:
+        construct_number(n.expr->expr_union.binary.arg1);
+        construct_number(n.expr->expr_union.binary.arg2);
         switch (n.expr->expr_union.binary.op) {
         case 1:
             return get_add(n.expr->expr_union.binary.arg1,
