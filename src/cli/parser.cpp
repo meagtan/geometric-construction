@@ -1,6 +1,7 @@
 #include "include/cli.h"
 
-#define PRED(n) ((n) > 0 ? (n) - 1 : (n))
+#define PRED(n)  ((n) > 0 ? (n) - 1 : (n))
+#define MIN(m,n) ((m) < (n) ? (m) : (n))
 
 // CLIProgram
 
@@ -130,7 +131,7 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
     const string bin_ops = "+-*/";
     stack<constr_num> output;
     stack<char> operators;
-    int n;
+    int n, p;
     char c, op;
 
     // read until empty
@@ -145,8 +146,16 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
             continue;
         }
 
+        // look for "sqrt", if found set pos at 't'
+        // first check for an invalid lone 't'
+        if (str[pos] == 't')
+            return false;
+        for (p = pos; p < MIN(end, pos + 3) && str[p] == "sqrt"[p-pos]; ++p);
+        if (p < end && p == pos + 3 && str[p] == 't')
+            pos = p;
+
         switch (c = str[pos++]) {
-        case 's': // for now, take sqrt to be written as 's'
+        case 't': // sqrt
         case '(':
             // if reading unary operator or left parenthesis, push to operators
             operators.push(c);
@@ -179,7 +188,7 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
                 return false;
             operators.pop();
 
-            if (!operators.empty() && operators.top() == 's') {
+            if (!operators.empty() && operators.top() == 't') {
                 // apply operators.top() to output
                 apply(operators.top(), output);
                 operators.pop();
@@ -217,7 +226,7 @@ bool CLIProgram::apply(int op, stack<constr_num> &output)
         return false;
 
     switch (op) {
-    case 's':
+    case 't':
         output.top() = sqrt(output.top());
         break;
     OP_CASE(+, '+');

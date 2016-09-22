@@ -1,7 +1,5 @@
 #include "include/cli.h"
 
-#define PRED(n) ((n) > 0 ? (n) - 1 : (n))
-
 // CLIProgram
 
 CLIProgram::CLIProgram() : c(this)
@@ -93,7 +91,7 @@ void CLIProgram::print(const Angle &a)
 
 void CLIProgram::print(constr_num n)
 {
-    cout << d.get_name(n) << " = The constructible number " << n << endl;
+    cout << d.get_name(n) << " = " << n << endl;
 }
 
 // Shape
