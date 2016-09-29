@@ -93,10 +93,12 @@ bool CLIProgram::parse_arg(Shape *shape, string input, Shape::Type type)
         // if type is Number, try to parse num
         *shape = Shape(num);
         d.add(*shape);
-        auto p = c.get_point(num);
+        /*
+        auto p = c.construct_number(num);
         if (p != nullptr) d.add(p);
-        p = c.get_point(0, num);
+        p = c.construct_number(num, 1);
         if (p != nullptr) d.add(p);
+        */
         return true;
     } else if (type == Shape::Point) {
         // if type is Point, try to parse (num, num)
@@ -138,6 +140,8 @@ bool CLIProgram::parse_num(constr_num *num, string str, int pos, int end)
     while (pos < end) {
         // skip whitespace
         for (; pos < end && isspace(str[pos]); ++pos);
+        if (pos == end)
+            break;
 
         // if reading number, push number to output
         if (isdigit(str[pos])) {

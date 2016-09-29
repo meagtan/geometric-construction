@@ -179,8 +179,8 @@ Dictionary::Dictionary()
     add("origin", origin);
     add("x_axis", x_axis);
     add("y_axis", y_axis);
-    add(unit_x);
-    add(unit_y);
+    add("(1,0)", unit_x);
+    add("(0,1)", unit_y);
 }
 
 Dictionary::~Dictionary() {}

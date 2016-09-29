@@ -23,8 +23,6 @@ using std::map;
 using std::pair;
 using std::stack;
 using std::string;
-using std::unordered_map;
-using std::unordered_multimap;
 
 // all this for what would amount to a simple apply call in lisp
 
@@ -162,7 +160,7 @@ struct Command {
     {"print", Command({Shape::Type::_type}, +[](CLIProgram &p, Calculator &, Shape shapes[]) { \
                                                    p.print(*shapes[0].u._arg); })}
 
-const unordered_multimap<string,Command> commands ({
+const std::multimap<string,Command> commands ({
     {"help", Command({}, +[](CLIProgram &p, Calculator &, Shape[]) {p.help();})},
     {"quit", Command({}, +[](CLIProgram &p, Calculator &, Shape[]) {p.quit();})},
     PRINT_COMM(Point, p),
