@@ -22,6 +22,8 @@ struct Point {
 
     bool operator==(const Point &other) const;
     bool operator!=(const Point &other) const;
+
+    friend ostream &operator<<(ostream &, const Point &);
 };
 
 struct Circle; // forward declare for Line::meet(const Circle &)

@@ -20,6 +20,11 @@ bool Point::operator!=(const Point &other) const
     return !operator ==(other);
 }
 
+ostream &operator<<(ostream &s, const Point &p)
+{
+    return s << '(' << p.x << ',' << p.y << ')';
+}
+
 // Line
 
 Line::Line(constr_num x_coeff, constr_num y_coeff, constr_num const_coeff) :

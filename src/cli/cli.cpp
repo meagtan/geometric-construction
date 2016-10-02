@@ -63,7 +63,7 @@ void CLIProgram::add(Shape shape)
 
 void CLIProgram::print(const Point &p)
 {
-    cout << d.get_name(&p) << " = The point (" << p.x << "," << p.y << ")" << endl;
+    cout << d.get_name(&p) << " = The point " << p << endl;
 }
 
 void CLIProgram::print(const Line &l)
@@ -73,12 +73,12 @@ void CLIProgram::print(const Line &l)
 
 void CLIProgram::print(const Circle &c)
 {
-    cout << d.get_name(&c) << " = The circle with center (" << c.center.x << "," << c.center.y << ") and radius " << c.radius << endl;
+    cout << d.get_name(&c) << " = The circle with center " << c.center << " and radius " << c.radius << endl;
 }
 
 void CLIProgram::print(const LineSegment &s)
 {
-    cout << d.get_name(&s) << " = The line segment between points (" << s.start.x << "," << s.start.y << ") and (" << s.end.x << "," << s.end.y << ")" << endl;
+    cout << d.get_name(&s) << " = The line segment between points " << s.start << " and " << s.end << endl;
 }
 
 void CLIProgram::print(const Angle &a)
@@ -235,7 +235,7 @@ string Dictionary::generate_name(Shape shape)
     if (type == Shape::Number && shape.n.is_int())
         s << shape.n;
     else if (type == Shape::Point && shape.u.p->x.is_int() && shape.u.p->y.is_int())
-        s << '(' << shape.u.p->x << ',' << shape.u.p->y << ')';
+        s << *shape.u.p;
     else
         s << letters[type] << counter[type]++;
     return s.str();
