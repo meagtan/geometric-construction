@@ -112,7 +112,7 @@ const Point *Calculator::get_sqrt(constr_num a, bool on_y_axis)
     auto *center = midpoint(*neg, *pa);
     assert(center != nullptr); // both neg and pa are contained
 
-    auto meets = meet(on_y_axis ? *x_axis : *y_axis, *join_circle(*center, *pa)); // circle will always exist, as center != pa
+    auto meets = meet(on_y_axis ? *y_axis : *x_axis, *join_circle(*center, *pa)); // circle will always exist, as center != pa
 
     return (on_y_axis ? meets.first->x : meets.first->y) < 0 ? meets.second : meets.first; // (0, √a)
 }
