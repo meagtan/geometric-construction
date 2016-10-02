@@ -124,25 +124,25 @@ const Point *Calculator::construct_number(constr_num n, bool on_y_axis)
     case 0:
         return GET_POINT(n, on_y_axis);
     case 1:
-        construct_number(n.expr->expr_union.unary.arg);
+        construct_number(n.copy(n.expr->expr_union.unary.arg));
         switch (n.expr->expr_union.unary.op) {
         case 1:
-            return get_sub(0, n.expr->expr_union.unary.arg, on_y_axis);
+            return get_sub(0, n.copy(n.expr->expr_union.unary.arg), on_y_axis);
         case 2:
-            return get_div(1, n.expr->expr_union.unary.arg, on_y_axis);
+            return get_div(1, n.copy(n.expr->expr_union.unary.arg), on_y_axis);
         default:
-            return get_sqrt(n.expr->expr_union.unary.arg, on_y_axis);
+            return get_sqrt(n.copy(n.expr->expr_union.unary.arg), on_y_axis);
         }
     default:
-        construct_number(n.expr->expr_union.binary.arg1);
-        construct_number(n.expr->expr_union.binary.arg2);
+        construct_number(n.copy(n.expr->expr_union.binary.arg1));
+        construct_number(n.copy(n.expr->expr_union.binary.arg2));
         switch (n.expr->expr_union.binary.op) {
         case 1:
-            return get_add(n.expr->expr_union.binary.arg1,
-                           n.expr->expr_union.binary.arg2, on_y_axis);
+            return get_add(n.copy(n.expr->expr_union.binary.arg1),
+                           n.copy(n.expr->expr_union.binary.arg2), on_y_axis);
         default:
-            return get_mul(n.expr->expr_union.binary.arg1,
-                           n.expr->expr_union.binary.arg2, on_y_axis);
+            return get_mul(n.copy(n.expr->expr_union.binary.arg1),
+                           n.copy(n.expr->expr_union.binary.arg2), on_y_axis);
         }
     }
 }
