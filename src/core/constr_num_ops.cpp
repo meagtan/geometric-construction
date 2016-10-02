@@ -7,42 +7,47 @@
 #define IS_SQRT(ptr_to_expr)      ((ptr_to_expr)->type == constr_num::Expr::unary  && ((ptr_to_expr)->expr_union.unary.op & 4))
 #define IS_ADDITION(ptr_to_expr)  ((ptr_to_expr)->type == constr_num::Expr::binary && ((ptr_to_expr)->expr_union.binary.op & 1))
 #define IS_PRODUCT(ptr_to_expr)   ((ptr_to_expr)->type == constr_num::Expr::binary && ((ptr_to_expr)->expr_union.binary.op & 2))
+#define RES(num) do { \
+    constr_num res = num; \
+    if (res.is_int())\
+        return constr_num(res.constant((int) res.value())); \
+    return res;} while (0)
 
 // Arithmetic operations for constr_num
 
 constr_num constr_num::operator-() const
 {
-    return constr_num(negate(expr));
+    RES(negate(expr));
 }
 
 constr_num constr_num::operator+(const constr_num &a) const
 {
-    return constr_num(add(expr, a.expr));
+    RES(constr_num(add(expr, a.expr)));
 }
 
 constr_num constr_num::operator-(const constr_num &a) const
 {
-    return operator+(-a);
+    RES(operator+(-a));
 }
 
 constr_num constr_num::operator*(const constr_num &a) const
 {
-    return constr_num(mul(expr, a.expr));
+    RES(constr_num(mul(expr, a.expr)));
 }
 
 constr_num constr_num::operator/(const constr_num &a) const
 {
-    return operator*(a.inv());
+    RES(operator*(a.inv()));
 }
 
 constr_num constr_num::inv() const
 {
-    return constr_num(invert(expr));
+    RES(constr_num(invert(expr)));
 }
 
 constr_num sqrt(const constr_num &a)
 {
-    return constr_num(a._sqrt(a.expr));
+    RES(constr_num(a._sqrt(a.expr)));
 }
 
 constr_num::Expr *constr_num::constant(int value) const
