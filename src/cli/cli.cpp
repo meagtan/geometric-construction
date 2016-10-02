@@ -198,6 +198,11 @@ string Dictionary::get_name(Shape shape)
     auto iter = std::find_if(shapes.begin(), shapes.end(), [shape](const pair<string,Shape> &p){return p.second == shape;});
     if (iter != shapes.end())
         return iter->first;
+    if (shape.type == Shape::Point && auto_construct_ints && shape.u.p->x.is_int() && shape.u.p->y.is_int()) {
+        string name = generate_name(shape);
+        shapes.emplace(std::make_pair(name, shape));
+        return name;
+    }
     return "";
 }
 
@@ -205,7 +210,7 @@ string Dictionary::add(Shape shape)
 {
     string name = get_name(shape);
     if (name == "") {
-        name = generate_name(shape.type);
+        name = generate_name(shape);
         shapes.emplace(std::make_pair(name, shape));
     }
     return name;
@@ -222,9 +227,18 @@ string Dictionary::add(string name, Shape shape)
 }
 
 // TODO make this distinguish primary results of a command from other shapes, perhaps through names
-string Dictionary::generate_name(int type)
+string Dictionary::generate_name(Shape shape)
 {
-    return letters[type] + std::to_string(counter[type]++);
+    int type = shape.type;
+    std::stringstream s;
+
+    if (type == Shape::Number && shape.n.is_int())
+        s << shape.n;
+    else if (type == Shape::Point && shape.u.p->x.is_int() && shape.u.p->y.is_int())
+        s << '(' << shape.u.p->x << ',' << shape.u.p->y << ')';
+    else
+        s << letters[type] << counter[type]++;
+    return s.str();
 }
 
 // Command

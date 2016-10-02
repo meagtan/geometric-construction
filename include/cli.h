@@ -79,7 +79,7 @@ struct Dictionary {
 private:
     int counter[6] = {0};
     char letters[6] = {'P', 'L', 'C', 'S', 'A', 'N'};
-    string generate_name(int type);
+    string generate_name(Shape shape);
 };
 
 class CLIProgram : protected MoveListener {
