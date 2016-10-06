@@ -68,12 +68,12 @@ public:
 
     constr_num &operator=(const constr_num &a);
 
-    constr_num operator-() const;
+    friend constr_num operator-(const constr_num &);
 
-    constr_num operator+(const constr_num &a) const;
-    constr_num operator-(const constr_num &a) const;
-    constr_num operator*(const constr_num &a) const;
-    constr_num operator/(const constr_num &a) const;
+    friend constr_num operator+(const constr_num &, const constr_num &);
+    friend constr_num operator-(const constr_num &, const constr_num &);
+    friend constr_num operator*(const constr_num &, const constr_num &);
+    friend constr_num operator/(const constr_num &, const constr_num &);
 
     bool operator==(const constr_num &a) const;
     bool operator!=(const constr_num &a) const;

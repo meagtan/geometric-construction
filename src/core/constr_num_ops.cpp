@@ -15,29 +15,29 @@
 
 // Arithmetic operations for constr_num
 
-constr_num constr_num::operator-() const
+constr_num operator-(const constr_num &a)
 {
-    RES(negate(expr));
+    RES(a.negate(a.expr));
 }
 
-constr_num constr_num::operator+(const constr_num &a) const
+constr_num operator+(const constr_num &a, const constr_num &b)
 {
-    RES(constr_num(add(expr, a.expr)));
+    RES(constr_num(a.add(a.expr, b.expr)));
 }
 
-constr_num constr_num::operator-(const constr_num &a) const
+constr_num operator-(const constr_num &a, const constr_num &b)
 {
-    RES(operator+(-a));
+    RES(a + (-b));
 }
 
-constr_num constr_num::operator*(const constr_num &a) const
+constr_num operator*(const constr_num &a, const constr_num &b)
 {
-    RES(constr_num(mul(expr, a.expr)));
+    RES(constr_num(a.mul(a.expr, b.expr)));
 }
 
-constr_num constr_num::operator/(const constr_num &a) const
+constr_num operator/(const constr_num &a, const constr_num &b)
 {
-    RES(operator*(a.inv()));
+    RES(a * b.inv());
 }
 
 constr_num constr_num::inv() const

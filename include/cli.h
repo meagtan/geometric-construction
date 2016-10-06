@@ -169,8 +169,10 @@ const std::multimap<string,Command> commands ({
     PRINT_COMM(Segment, s),
     PRINT_COMM(Angle, a),
     {"print", Command({Shape::Type::Number}, +[](CLIProgram &p, Calculator &, Shape shapes[]) {p.print(shapes[0].n);})},
-    {"construct", Command({Shape::Type::Number}, +[](CLIProgram &p, Calculator &c, Shape shapes[]) {p.add(c.construct_point(shapes[0].n));})},
     // unary commands
+    //  calculator
+    {"construct", Command({Shape::Type::Number}, +[](CLIProgram &p, Calculator &c, Shape shapes[]) {p.add(c.construct_number(shapes[0].n));})},
+    {"construct", UNARY_COMMAND_OBJ(construct_point, Point, p)},
     //  constructor
     UNARY_COMMAND(bisect, Segment, s),
     UNARY_COMMAND(bisect, Angle, a),
