@@ -112,34 +112,34 @@ constr_num &constr_num::operator=(const constr_num &a)
     return *this;
 }
 
-bool constr_num::operator==(const constr_num &a) const
+bool operator==(const constr_num &a, const constr_num &b)
 {
-    return value() == a.value();
+    return a.value() == b.value();
 }
 
-bool constr_num::operator!=(const constr_num &a) const
+bool operator!=(const constr_num &a, const constr_num &b)
 {
-    return value() != a.value();
+    return a.value() != b.value();
 }
 
-bool constr_num::operator<(const constr_num &a) const
+bool operator<(const constr_num &a, const constr_num &b)
 {
-    return value() < a.value();
+    return a.value() < b.value();
 }
 
-bool constr_num::operator>(const constr_num &a) const
+bool operator>(const constr_num &a, const constr_num &b)
 {
-    return value() > a.value();
+    return a.value() > b.value();
 }
 
-bool constr_num::operator<=(const constr_num &a) const
+bool operator<=(const constr_num &a, const constr_num &b)
 {
-    return value() <= a.value();
+    return a.value() <= b.value();
 }
 
-bool constr_num::operator>=(const constr_num &a) const
+bool operator>=(const constr_num &a, const constr_num &b)
 {
-    return value() >= a.value();
+    return a.value() >= b.value();
 }
 
 ostream &operator<<(ostream &s, const constr_num &a)

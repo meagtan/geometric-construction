@@ -75,12 +75,12 @@ public:
     friend constr_num operator*(const constr_num &, const constr_num &);
     friend constr_num operator/(const constr_num &, const constr_num &);
 
-    bool operator==(const constr_num &a) const;
-    bool operator!=(const constr_num &a) const;
-    bool operator<(const constr_num &a) const;
-    bool operator>(const constr_num &a) const;
-    bool operator<=(const constr_num &a) const;
-    bool operator>=(const constr_num &a) const;
+    friend bool operator==(const constr_num &, const constr_num &);
+    friend bool operator!=(const constr_num &, const constr_num &);
+    friend bool operator<(const constr_num &, const constr_num &);
+    friend bool operator>(const constr_num &, const constr_num &);
+    friend bool operator<=(const constr_num &, const constr_num &);
+    friend bool operator>=(const constr_num &, const constr_num &);
 
     friend ostream &operator<<(ostream &s, const constr_num &a);
 
